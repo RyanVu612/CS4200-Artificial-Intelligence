@@ -1,7 +1,10 @@
 package project1;
 
+import java.util.Scanner;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 
 public class Puzzle {
     public static void main (String[] args) {
@@ -9,14 +12,37 @@ public class Puzzle {
         printBoard(board);
     }  
 
-    public static int[][] generateBoard (int[][] array) {
-        return array;
-    }
-
+    @SuppressWarnings("resource")
     public static int[][] generateBoard () {
-        ArrayList<Integer> numbers = new ArrayList<Integer>();
-        for (int i=0; i<9; i++) numbers.add(i);
-        Collections.shuffle(numbers);
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Please enter in a board. If you wish to generate a random board, enter 'random.'");
+        System.out.println("Example of board input: '0, 1, 2, 3, 4, 5, 6, 7, 8' will generate this board:");
+        System.out.println("0 1 2\n3 4 5\n6 7 8");
+        System.out.print("Enter input: ");
+
+        String input = scanner.nextLine();
+
+        Set<Integer> numbersSet = new HashSet<>();
+        ArrayList<Integer> numbers = new ArrayList<>();
+        if (input.equals("random")) {
+            for (int i = 0; i < 9; i++) {
+                numbers.add(i);
+            }
+            Collections.shuffle(numbers);
+        } else {
+            while (numbersSet.size() < 8) {
+                for (int i = 0; i < input.length(); i += 3) {
+                    numbersSet.add(Character.getNumericValue(input.charAt(i)));
+                }
+
+                if (numbersSet.size() < 8 || Collections.min(numbersSet) < 0 || Collections.max(numbersSet) > 8) {
+                    numbersSet.clear();
+                    System.out.print("Error. Invalid input.\nEnter a valid input: ");
+                    input = scanner.nextLine();
+                }
+            }
+            numbers.addAll(numbersSet);    
+        }
         
         int[][] board = {
             {numbers.get(0), numbers.get(1), numbers.get(2)},
