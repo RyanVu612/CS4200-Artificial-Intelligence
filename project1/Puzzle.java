@@ -24,6 +24,8 @@ public class Puzzle {
 
         Set<Integer> numbersSet = new HashSet<>();
         ArrayList<Integer> numbers = new ArrayList<>();
+
+        // Random Input
         if (input.equals("random")) {
             for (int i = 0; i < 9; i++) {
                 numbers.add(i);
@@ -31,19 +33,23 @@ public class Puzzle {
             Collections.shuffle(numbers);
         } else {
             while (numbersSet.size() < 8) {
+                // Add inputted numbers into a set
                 for (int i = 0; i < input.length(); i += 3) {
                     numbersSet.add(Character.getNumericValue(input.charAt(i)));
                 }
 
+                // If there were any duplicates, or numbers not between 0-8, prompt for new board
                 if (numbersSet.size() < 8 || Collections.min(numbersSet) < 0 || Collections.max(numbersSet) > 8) {
                     numbersSet.clear();
                     System.out.print("Error. Invalid input.\nEnter a valid input: ");
                     input = scanner.nextLine();
                 }
             }
+            // Add numbers of the set to the arraylist
             numbers.addAll(numbersSet);    
         }
         
+        // Put numbers of arrayList into 2d array.
         int[][] board = {
             {numbers.get(0), numbers.get(1), numbers.get(2)},
             {numbers.get(3), numbers.get(4), numbers.get(5)},
