@@ -4,13 +4,72 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+
+class Node {
+    private String board;
+    private int g;
+    private int h;
+
+    public Node (String board, int g) {
+        this.board = board;
+        this.g = g++;
+        h = calculateH();
+    }
+
+    public int calculateH() {
+        // calculate the distance each tile is from its goal position. (col + row)
+        int totalDist = 0;
+        int value;
+        for (int i = 0; i < board.length(); i++) {
+            value = Character.getNumericValue(board.charAt(i));
+
+            //skip 0 since empty spot
+            if (value == 0) continue;
+
+            // Row dist = i / 3
+            // Col dist = i % 3
+
+            // Add the dist for each tile to total distance
+            totalDist += (Math.abs(value / 3 - i / 3) + Math.abs(value % 3 - i % 3));
+        }
+
+        return totalDist;
+    }
+
+    public String getBoard() {
+        return board;
+    }
+
+    public void printBoard() {
+        int j = 0;
+        for (int i = 1; i < board.length(); i += 3) {
+            System.out.print(board.charAt(i) + " ");
+            if (j % 3 == 2) {
+                System.out.println();
+            }
+            j++;
+        }
+    }
+
+    public int getG() {
+        return g;
+    }
+
+    public int getH() {
+        return h;
+    }
+}
 
 public class Puzzle {
     public static void main (String[] args) {
-        String board = generateBoard();
+        Node initialNode = generateBoard();
+        Map<String, Integer> gValue = new HashMap<>();  // board -> g value
+        gValue.put(initialNode.getBoard(), initialNode.getG());
 
-        printBoard(board);
+        initialNode.printBoard();
     }  
 
     public void aStar() {
@@ -18,7 +77,7 @@ public class Puzzle {
     }
 
     @SuppressWarnings("resource")
-    public static String generateBoard () {
+    public static Node generateBoard () {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter in a board. If you wish to generate a random board, enter 'random.'");
         System.out.println("Example of board input: '0, 1, 2, 3, 4, 5, 6, 7, 8' will generate this board:");
@@ -54,17 +113,7 @@ public class Puzzle {
             numbers.addAll(numbersSet);    
         }
             
-        return numbers.toString();
-    }
-
-    public static void printBoard(String board) {
-        int j = 0;
-        for (int i = 1; i < board.length(); i += 3) {
-            System.out.print(board.charAt(i) + " ");
-            if (j % 3 == 2) {
-                System.out.println();
-            }
-            j++;
-        }
+        Node node = new Node(numbers.toString(), 0);
+        return node;
     }
 }
