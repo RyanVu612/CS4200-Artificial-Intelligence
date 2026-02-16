@@ -7,14 +7,22 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 public class Puzzle {
     public static void main (String[] args) {
         Node initialNode = generateBoard();
         Map<String, Integer> gValue = new HashMap<>();  // board -> g value
+
+        // Change comparator to use F
+        PriorityQueue<Node> priorityQueue = new PriorityQueue<>((a, b) -> a.getF() - b.getF());
+
+        priorityQueue.add(initialNode);
         gValue.put(initialNode.getBoard(), initialNode.getG());
 
-        initialNode.printBoard();
+        while (!priorityQueue.isEmpty()) {
+
+        }
     }  
 
     public void aStar() {
@@ -63,8 +71,24 @@ public class Puzzle {
     }
 }
 
+// Directional Enum
+enum Direction {
+    UP(-1, 0),
+    DOWN(1, 0),
+    LEFT(0, -1),
+    RIGHT(0, 1);
+
+    int dr, dc;
+
+    Direction(int dr, int dc) {
+        this.dr = dr;
+        this.dc = dc;
+    }
+}
+
 class Node {
     private String board;
+    private int f;
     private int g;
     private int h;
 
@@ -72,6 +96,7 @@ class Node {
         this.board = board;
         this.g = g++;
         h = calculateH();
+        f = g + h;
     }
 
     public int calculateH() {
@@ -107,6 +132,10 @@ class Node {
             }
             j++;
         }
+    }
+
+    public int getF() {
+        return f;
     }
 
     public int getG() {
