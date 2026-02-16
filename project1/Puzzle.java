@@ -8,61 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-class Node {
-    private String board;
-    private int g;
-    private int h;
-
-    public Node (String board, int g) {
-        this.board = board;
-        this.g = g++;
-        h = calculateH();
-    }
-
-    public int calculateH() {
-        // calculate the distance each tile is from its goal position. (col + row)
-        int totalDist = 0;
-        int value;
-        for (int i = 0; i < board.length(); i++) {
-            value = Character.getNumericValue(board.charAt(i));
-
-            //skip 0 since empty spot
-            if (value == 0) continue;
-
-            // Row dist = i / 3
-            // Col dist = i % 3
-
-            // Add the dist for each tile to total distance
-            totalDist += (Math.abs(value / 3 - i / 3) + Math.abs(value % 3 - i % 3));
-        }
-
-        return totalDist;
-    }
-
-    public String getBoard() {
-        return board;
-    }
-
-    public void printBoard() {
-        int j = 0;
-        for (int i = 1; i < board.length(); i += 3) {
-            System.out.print(board.charAt(i) + " ");
-            if (j % 3 == 2) {
-                System.out.println();
-            }
-            j++;
-        }
-    }
-
-    public int getG() {
-        return g;
-    }
-
-    public int getH() {
-        return h;
-    }
-}
-
 public class Puzzle {
     public static void main (String[] args) {
         Node initialNode = generateBoard();
@@ -115,5 +60,60 @@ public class Puzzle {
             
         Node node = new Node(numbers.toString(), 0);
         return node;
+    }
+}
+
+class Node {
+    private String board;
+    private int g;
+    private int h;
+
+    public Node (String board, int g) {
+        this.board = board;
+        this.g = g++;
+        h = calculateH();
+    }
+
+    public int calculateH() {
+        // calculate the distance each tile is from its goal position. (col + row)
+        int totalDist = 0;
+        int value;
+        for (int i = 0; i < board.length(); i++) {
+            value = Character.getNumericValue(board.charAt(i));
+
+            //skip 0 since empty spot
+            if (value == 0) continue;
+
+            // Row dist = i / 3
+            // Col dist = i % 3
+
+            // Add the dist for each tile to total distance
+            totalDist += (Math.abs(value / 3 - i / 3) + Math.abs(value % 3 - i % 3));
+        }
+
+        return totalDist;
+    }
+
+    public String getBoard() {
+        return board;
+    }
+
+    public void printBoard() {
+        int j = 0;
+        for (int i = 1; i < board.length(); i += 3) {
+            System.out.print(board.charAt(i) + " ");
+            if (j % 3 == 2) {
+                System.out.println();
+            }
+            j++;
+        }
+    }
+
+    public int getG() {
+        return g;
+    }
+
+    public int getH() {
+        return h;
     }
 }
