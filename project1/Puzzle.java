@@ -8,12 +8,17 @@ import java.util.HashSet;
 
 public class Puzzle {
     public static void main (String[] args) {
-        int[][] board = generateBoard();
+        String board = generateBoard();
+
         printBoard(board);
     }  
 
+    public void aStar() {
+
+    }
+
     @SuppressWarnings("resource")
-    public static int[][] generateBoard () {
+    public static String generateBoard () {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter in a board. If you wish to generate a random board, enter 'random.'");
         System.out.println("Example of board input: '0, 1, 2, 3, 4, 5, 6, 7, 8' will generate this board:");
@@ -48,23 +53,18 @@ public class Puzzle {
             // Add numbers of the set to the arraylist
             numbers.addAll(numbersSet);    
         }
-        
-        // Put numbers of arrayList into 2d array.
-        int[][] board = {
-            {numbers.get(0), numbers.get(1), numbers.get(2)},
-            {numbers.get(3), numbers.get(4), numbers.get(5)},
-            {numbers.get(6), numbers.get(7), numbers.get(8)}
-        };
             
-        return board;
+        return numbers.toString();
     }
 
-    public static void printBoard(int[][] board) {
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[0].length; j++) {
-                System.out.print(board[i][j] + " ");
+    public static void printBoard(String board) {
+        int j = 0;
+        for (int i = 1; i < board.length(); i += 3) {
+            System.out.print(board.charAt(i) + " ");
+            if (j % 3 == 2) {
+                System.out.println();
             }
-            System.out.print("\n");
+            j++;
         }
     }
 }
