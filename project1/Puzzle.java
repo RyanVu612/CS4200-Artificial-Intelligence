@@ -29,10 +29,20 @@ public class Puzzle {
             int zeroCol = currentNode.getZeroIndex() % 3;
             
             for (Direction d: Direction.values()) {
-                if (zeroRow + d.dr >= 0 && zeroRow + d.dr <= 2 && 
-                    zeroCol + d.dc >= 0 && zeroCol + d.dc <= 2) {
-                        generateNeighborNode(currentNode, d);
+                // make sure not on border
+                if (zeroRow + d.dr >= 0 && zeroRow + d.dr <= 2 && zeroCol + d.dc >= 0 && zeroCol + d.dc <= 2) {
+                    Node node = generateNeighborNode(currentNode, d);
+
+                    // If repeated node, replace key with smaller g value. Otherwise, add to hashmap.
+                    if (gValue.containsKey(node.getBoard()) && node.getG() < gValue.get(node.getBoard())) {
+                        gValue.put(node.getBoard(), node.getG());
+                    } else {
+                        gValue.put(node.getBoard(), node.getG());
                     }
+
+                    // add both old and new nodes. the ones with smaller g will be skipped later on.
+                    priorityQueue.add(node);
+                }
             }
         }
     }  
@@ -155,19 +165,19 @@ class Node {
         }
     }
 
-    public int getF() {
+    public Integer getF() {
         return f;
     }
 
-    public int getG() {
+    public Integer getG() {
         return g;
     }
 
-    public int getH() {
+    public Integer getH() {
         return h;
     }
 
-    public int getZeroIndex() {
+    public Integer getZeroIndex() {
         return zeroIndex;
     }
 }
