@@ -20,14 +20,22 @@ public class Puzzle {
         priorityQueue.add(initialNode);
         gValue.put(initialNode.getBoard(), initialNode.getG());
 
+        // AStar algorithm. Will go until no more states to visit or goal is met.
+        // When goal is met, break.
         while (!priorityQueue.isEmpty()) {
-
+            // check each direction
+            Node currentNode = priorityQueue.poll();
+            int zeroRow = currentNode.getZeroIndex() / 3;
+            int zeroCol = currentNode.getZeroIndex() % 3;
+            
+            for (Direction d: Direction.values()) {
+                if (zeroRow + d.dr >= 0 && zeroRow + d.dr <= 2 && 
+                    zeroCol + d.dc >= 0 && zeroCol + d.dc <= 2) {
+                        generateNeighborNode(currentNode, d);
+                    }
+            }
         }
     }  
-
-    public void aStar() {
-
-    }
 
     @SuppressWarnings("resource")
     public static Node generateBoard () {
@@ -69,6 +77,15 @@ public class Puzzle {
         Node node = new Node(numbers.toString(), 0);
         return node;
     }
+
+    public static Node generateNeighborNode(Node node, Direction d) {
+        char[] board = node.getBoard().toCharArray();
+
+        board[node.getZeroIndex()] = board[node.getZeroIndex() + (d.dr * 3 + d.dc)];
+        board[node.getZeroIndex() + (d.dr * 3 + d.dc)] = 0;
+
+        return new Node(String.valueOf(board), node.getG());
+    }
 }
 
 // Directional Enum
@@ -91,6 +108,7 @@ class Node {
     private int f;
     private int g;
     private int h;
+    private int zeroIndex;
 
     public Node (String board, int g) {
         this.board = board;
@@ -107,7 +125,10 @@ class Node {
             value = Character.getNumericValue(board.charAt(i));
 
             //skip 0 since empty spot
-            if (value == 0) continue;
+            if (value == 0) {
+                zeroIndex = i;
+                continue;
+            }
 
             // Row dist = i / 3
             // Col dist = i % 3
@@ -144,5 +165,9 @@ class Node {
 
     public int getH() {
         return h;
+    }
+
+    public int getZeroIndex() {
+        return zeroIndex;
     }
 }
