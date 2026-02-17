@@ -11,20 +11,27 @@ import java.util.PriorityQueue;
 
 public class Puzzle {
     public static void main (String[] args) {
-        Node initialNode = generateBoard();
-        Map<String, Integer> gValue = new HashMap<>();  // board -> g value
+        Node currentNode = generateBoard();
+        
+        Map<String, Integer> gValue = new HashMap<>();      // board -> g value
+        Map<String, String> parentMap = new HashMap<>();    // board -> parent board
 
         // Change comparator to use F
         PriorityQueue<Node> priorityQueue = new PriorityQueue<>((a, b) -> a.getF() - b.getF());
 
-        priorityQueue.add(initialNode);
-        gValue.put(initialNode.getBoard(), initialNode.getG());
+        priorityQueue.add(currentNode);
+        gValue.put(currentNode.getBoard(), currentNode.getG());
+        parentMap.put(currentNode.getBoard(), null);    // no parent to the initial
 
         // AStar algorithm. Will go until no more states to visit or goal is met.
         // When goal is met, break.
         while (!priorityQueue.isEmpty()) {
             // check each direction
-            Node currentNode = priorityQueue.poll();
+
+            if (currentNode.getG() == 0) {
+                break;
+            }
+
             int zeroRow = currentNode.getZeroIndex() / 3;
             int zeroCol = currentNode.getZeroIndex() % 3;
             
@@ -34,16 +41,20 @@ public class Puzzle {
                     Node node = generateNeighborNode(currentNode, d);
 
                     // If repeated node, replace key with smaller g value. Otherwise, add to hashmap.
+                    // In the case of repeated but larger g value, don't do anything.
                     if (gValue.containsKey(node.getBoard()) && node.getG() < gValue.get(node.getBoard())) {
                         gValue.put(node.getBoard(), node.getG());
+                        parentMap.put(node.getBoard(), currentNode.getBoard());
                     } else {
                         gValue.put(node.getBoard(), node.getG());
+                        parentMap.put(node.getBoard(), currentNode.getBoard());
                     }
 
                     // add both old and new nodes. the ones with smaller g will be skipped later on.
                     priorityQueue.add(node);
                 }
             }
+            currentNode = priorityQueue.poll();
         }
     }  
 
