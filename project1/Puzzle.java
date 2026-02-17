@@ -25,6 +25,10 @@ public class Puzzle {
         while (!priorityQueue.isEmpty()) {
             // check each direction
             Node currentNode = priorityQueue.poll();
+            if (currentNode.getH() == 0) {
+                break;
+            }
+
             int zeroRow = currentNode.getZeroIndex() / 3;
             int zeroCol = currentNode.getZeroIndex() % 3;
             
@@ -84,7 +88,7 @@ public class Puzzle {
             numbers.addAll(numbersSet);    
         }
             
-        Node node = new Node(numbers.toString(), 0);
+        Node node = new Node(null, numbers.toString(), 0);
         return node;
     }
 
@@ -94,7 +98,7 @@ public class Puzzle {
         board[node.getZeroIndex()] = board[node.getZeroIndex() + (d.dr * 3 + d.dc)];
         board[node.getZeroIndex() + (d.dr * 3 + d.dc)] = 0;
 
-        return new Node(String.valueOf(board), node.getG());
+        return new Node(node, String.valueOf(board), node.getG());
     }
 }
 
@@ -115,16 +119,18 @@ enum Direction {
 
 class Node {
     private String board;
+    private Node parent;
     private int f;
     private int g;
     private int h;
     private int zeroIndex;
 
-    public Node (String board, int g) {
+    public Node (Node parent, String board, int g) {
         this.board = board;
         this.g = g++;
         h = calculateH();
         f = g + h;
+        this.parent = parent;
     }
 
     public int calculateH() {
@@ -163,6 +169,10 @@ class Node {
             }
             j++;
         }
+    }
+
+    public Node getParentNode() {
+        return parent;
     }
 
     public Integer getF() {
