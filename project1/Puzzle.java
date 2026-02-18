@@ -1,17 +1,21 @@
 package project1;
 
 import java.util.Scanner;
-import java.util.Set;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Puzzle {
     public static void main (String[] args) {
         Node currentNode = generateBoard();
+        currentNode.printBoard();
+
+        if (!checkSolvability(currentNode.getBoard())) {
+            System.out.println("Board is not solvable");
+            return;
+        }
         
         Map<String, Integer> gValue = new HashMap<>();      // board -> g value
         Map<String, String> parentMap = new HashMap<>();    // board -> parent board
@@ -27,8 +31,9 @@ public class Puzzle {
         // When goal is met, break.
         while (!priorityQueue.isEmpty()) {
             // check each direction
+            currentNode.printBoard();
 
-            if (currentNode.getG() == 0) {
+            if (currentNode.getH() == 0) {
                 break;
             }
 
@@ -55,57 +60,87 @@ public class Puzzle {
                 }
             }
             currentNode = priorityQueue.poll();
+            System.out.println("===================");
         }
     }  
 
     @SuppressWarnings("resource")
     public static Node generateBoard () {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Please enter in a board. If you wish to generate a random board, enter 'random.'");
-        System.out.println("Example of board input: '0, 1, 2, 3, 4, 5, 6, 7, 8' will generate this board:");
-        System.out.println("0 1 2\n3 4 5\n6 7 8");
-        System.out.print("Enter input: ");
 
-        String input = scanner.nextLine();
+        while (true) {
+            System.out.println("Enter board as 9 digits. E.g.(012345678 or 'random'");
+            String input = scanner.nextLine();
+            ArrayList<Character> numbers = new ArrayList<>();
 
-        Set<Integer> numbersSet = new HashSet<>();
-        ArrayList<Integer> numbers = new ArrayList<>();
-
-        // Random Input
-        if (input.equals("random")) {
-            for (int i = 0; i < 9; i++) {
-                numbers.add(i);
-            }
-            Collections.shuffle(numbers);
-        } else {
-            while (numbersSet.size() < 8) {
-                // Add inputted numbers into a set
-                for (int i = 0; i < input.length(); i += 3) {
-                    numbersSet.add(Character.getNumericValue(input.charAt(i)));
+            // Random Input
+            if (input.equalsIgnoreCase("random")) {
+                for (char c = '0'; c < '9'; c++) {
+                    numbers.add(c);
                 }
-
-                // If there were any duplicates, or numbers not between 0-8, prompt for new board
-                if (numbersSet.size() < 8 || Collections.min(numbersSet) < 0 || Collections.max(numbersSet) > 8) {
-                    numbersSet.clear();
-                    System.out.print("Error. Invalid input.\nEnter a valid input: ");
-                    input = scanner.nextLine();
+                Collections.shuffle(numbers);
+                StringBuilder sb = new StringBuilder(9);
+                for (int i = 0; i < numbers.size(); i++) {
+                    sb.append(numbers.get(i));
                 }
+                return new Node(sb.toString(), 0);
+            } 
+
+            // Input validation
+            if (input.length() != 9) {
+                System.out.println("Error: Input must be exactly 9 numbers");
+                continue;
             }
-            // Add numbers of the set to the arraylist
-            numbers.addAll(numbersSet);    
-        }
+
+            boolean[] seen = new boolean[9];
+            boolean ok = true;
+            for (int i = 0; i < input.length(); i++) {
+                char c = input.charAt(i);
+                if (c < '0' || c > '8') {
+                    ok = false;
+                    break;
+                }
+                int v = c - '0';
+                if (seen[v]) {
+                    ok = false;
+                    break;
+                }
+                seen[v] = true;
+            }
+
+            if (!ok) {
+                System.out.println("Error: There must be no repeating values");
+            }
             
-        Node node = new Node(numbers.toString(), 0);
-        return node;
+            return new Node(input, 0);
+        }
     }
 
     public static Node generateNeighborNode(Node node, Direction d) {
         char[] board = node.getBoard().toCharArray();
+        char temp = board[node.getZeroIndex() + (d.dr * 3 + d.dc)];
 
-        board[node.getZeroIndex()] = board[node.getZeroIndex() + (d.dr * 3 + d.dc)];
-        board[node.getZeroIndex() + (d.dr * 3 + d.dc)] = 0;
+        board[node.getZeroIndex() + (d.dr * 3 + d.dc)] = '0';
+        board[node.getZeroIndex()] = temp;
 
-        return new Node(String.valueOf(board), node.getG());
+        return new Node(String.valueOf(board), node.getG() + 1);
+    }
+
+    public static boolean checkSolvability(String board) {
+        int counter = 0;
+
+
+        for (int i = 0; i < board.length(); i++) {
+            if (board.charAt(i) == '0') continue;
+            for (int j = i + 1; j < board.length(); j++) {
+                if (board.charAt(j) == '0') continue;
+                if (Integer.valueOf(board.charAt(i)) > Integer.valueOf(j)) {
+                    counter++;
+                }
+            }
+        }
+
+        return counter % 2 == 0;
     }
 }
 
@@ -133,47 +168,14 @@ class Node {
 
     public Node (String board, int g) {
         this.board = board;
-        this.g = g++;
+        this.g = g;
         h = calculateH();
         f = g + h;
-    }
-
-    public int calculateH() {
-        // calculate the distance each tile is from its goal position. (col + row)
-        int totalDist = 0;
-        int value;
-        for (int i = 0; i < board.length(); i++) {
-            value = Character.getNumericValue(board.charAt(i));
-
-            //skip 0 since empty spot
-            if (value == 0) {
-                zeroIndex = i;
-                continue;
-            }
-
-            // Row dist = i / 3
-            // Col dist = i % 3
-
-            // Add the dist for each tile to total distance
-            totalDist += (Math.abs(value / 3 - i / 3) + Math.abs(value % 3 - i % 3));
-        }
-
-        return totalDist;
+        zeroIndex = findZeroIndex();
     }
 
     public String getBoard() {
         return board;
-    }
-
-    public void printBoard() {
-        int j = 0;
-        for (int i = 1; i < board.length(); i += 3) {
-            System.out.print(board.charAt(i) + " ");
-            if (j % 3 == 2) {
-                System.out.println();
-            }
-            j++;
-        }
     }
 
     public Integer getF() {
@@ -188,7 +190,51 @@ class Node {
         return h;
     }
 
+    public int calculateH() {
+        // calculate the distance each tile is from its goal position. (col + row)
+        int totalDist = 0;
+        int value;
+        for (int i = 0; i < board.length(); i++) {
+            value = Character.getNumericValue(board.charAt(i));
+
+            //skip 0 since empty spot
+            if (value == 0) {
+                continue;
+            }
+
+            // Row dist = i / 3
+            // Col dist = i % 3
+
+            // Add the dist for each tile to total distance
+            totalDist += (Math.abs(value / 3 - i / 3) + Math.abs(value % 3 - i % 3));
+        }
+
+        return totalDist;
+    }
+
     public Integer getZeroIndex() {
         return zeroIndex;
+    }
+
+    public Integer findZeroIndex() {
+        for (int i = 0; i < board.length(); i++) {
+            if (board.charAt(i) == '0') {
+                zeroIndex = i;
+                return zeroIndex;
+            }
+        }
+        System.out.println("0 not found");
+        return -1;
+    }
+
+    public void printBoard() {
+        int j = 0;
+        for (int i = 0; i < board.length(); i ++) {
+            System.out.print(board.charAt(i) + " ");
+            if (j % 3 == 2) {
+                System.out.println();
+            }
+            j++;
+        }
     }
 }
