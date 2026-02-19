@@ -93,7 +93,7 @@ public class Puzzle {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.println("Enter board as 9 digits. E.g.(012345678 or 'random'");
+            System.out.print("Enter board as 9 digits. E.g.(012345678 or 'random': ");
             String input = scanner.nextLine();
             ArrayList<Character> numbers = new ArrayList<>();
 
