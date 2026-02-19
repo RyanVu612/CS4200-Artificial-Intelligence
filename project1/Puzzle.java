@@ -81,7 +81,7 @@ public class Puzzle {
 
         // Print path :D
         for (String s : path) {
-            System.out.println("=============2");
+            System.out.println("=============");
             printBoard(s);
         }
 
