@@ -84,6 +84,8 @@ public class Puzzle {
             System.out.println("=============2");
             printBoard(s);
         }
+
+        System.out.println("Total moves: " + path.size());
     }  
 
     @SuppressWarnings("resource")
