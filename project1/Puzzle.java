@@ -10,7 +10,6 @@ import java.util.PriorityQueue;
 public class Puzzle {
     public static void main (String[] args) {
         Node currentNode = generateBoard();
-        currentNode.printBoard();
 
         if (!checkSolvability(currentNode.getBoard())) {
             System.out.println("Board is not solvable");
@@ -25,14 +24,18 @@ public class Puzzle {
 
         priorityQueue.add(currentNode);
         gValue.put(currentNode.getBoard(), currentNode.getG());
+        String parentBoard = currentNode.getBoard();
         parentMap.put(currentNode.getBoard(), null);    // no parent to the initial
 
         // AStar algorithm. Will go until no more states to visit or goal is met.
         // When goal is met, break.
         while (!priorityQueue.isEmpty()) {
-            // check each direction
-            currentNode.printBoard();
+            currentNode = priorityQueue.poll();
+            if (currentNode.getG() > gValue.get(currentNode.getBoard())) {
+                continue; // outdated version of this board
+            }
 
+            // check each direction
             if (currentNode.getH() == 0) {
                 break;
             }
@@ -47,20 +50,39 @@ public class Puzzle {
 
                     // If repeated node, replace key with smaller g value. Otherwise, add to hashmap.
                     // In the case of repeated but larger g value, don't do anything.
-                    if (gValue.containsKey(node.getBoard()) && node.getG() < gValue.get(node.getBoard())) {
+                    if (!gValue.containsKey(node.getBoard())) {
                         gValue.put(node.getBoard(), node.getG());
                         parentMap.put(node.getBoard(), currentNode.getBoard());
-                    } else {
+                    } else if (node.getG() < gValue.get(node.getBoard())) {
                         gValue.put(node.getBoard(), node.getG());
                         parentMap.put(node.getBoard(), currentNode.getBoard());
                     }
-
                     // add both old and new nodes. the ones with smaller g will be skipped later on.
                     priorityQueue.add(node);
                 }
             }
-            currentNode = priorityQueue.poll();
-            System.out.println("===================");
+        }
+
+        // currentNode now holds the node with goal. 
+        // Need to figure out the path by retracing parents.
+        String sBoard = currentNode.getBoard();
+        ArrayList<String> path = new ArrayList<>();
+
+        while (sBoard != null) {
+            path.add(sBoard);
+            sBoard = parentMap.get(sBoard);
+        }
+
+        // add parent
+        path.add(parentBoard);
+
+        // Reverse path to get from original path to goal
+        Collections.reverse(path);
+
+        // Print path :D
+        for (String s : path) {
+            System.out.println("=============2");
+            printBoard(s);
         }
     }  
 
@@ -110,6 +132,7 @@ public class Puzzle {
 
             if (!ok) {
                 System.out.println("Error: There must be no repeating values");
+                continue;
             }
             
             return new Node(input, 0);
@@ -129,18 +152,30 @@ public class Puzzle {
     public static boolean checkSolvability(String board) {
         int counter = 0;
 
-
         for (int i = 0; i < board.length(); i++) {
-            if (board.charAt(i) == '0') continue;
+            int a = board.charAt(i) - '0';
+            if (a == 0) continue;
             for (int j = i + 1; j < board.length(); j++) {
-                if (board.charAt(j) == '0') continue;
-                if (Integer.valueOf(board.charAt(i)) > Integer.valueOf(j)) {
+                int b = board.charAt(j) - '0';
+                if (b == 0) continue;
+                if (a > b) {
                     counter++;
                 }
             }
         }
 
         return counter % 2 == 0;
+    }
+
+    public static void printBoard(String board) {
+        int j = 0;
+        for (int i = 0; i < board.length(); i ++) {
+            System.out.print(board.charAt(i) + " ");
+            if (j % 3 == 2) {
+                System.out.println();
+            }
+            j++;
+        }
     }
 }
 
@@ -225,16 +260,5 @@ class Node {
         }
         System.out.println("0 not found");
         return -1;
-    }
-
-    public void printBoard() {
-        int j = 0;
-        for (int i = 0; i < board.length(); i ++) {
-            System.out.print(board.charAt(i) + " ");
-            if (j % 3 == 2) {
-                System.out.println();
-            }
-            j++;
-        }
     }
 }
