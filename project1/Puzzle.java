@@ -1,144 +1,177 @@
 package project1;
 
 import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Puzzle {
     public static void main (String[] args) {
-        Node currentNode = generateBoard();
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("Select:\n[1] Single Test Puzzle\n[2] Multi-Test Puzzle\n[3] Exit");
+            int test = scanner.nextInt();
 
-        if (!checkSolvability(currentNode.getBoard())) {
-            System.out.println("Board is not solvable");
-            return;
-        }
-        
-        Map<String, Integer> gValue = new HashMap<>();      // board -> g value
-        Map<String, String> parentMap = new HashMap<>();    // board -> parent board
+            if (test == 1) {
+                // Single Test Puzzle
+            } else if (test == 2) {
+                // Multi-Test Puzzle
 
-        // Change comparator to use F
-        PriorityQueue<Node> priorityQueue = new PriorityQueue<>((a, b) -> a.getF() - b.getF());
-
-        priorityQueue.add(currentNode);
-        gValue.put(currentNode.getBoard(), currentNode.getG());
-        String parentBoard = currentNode.getBoard();
-        parentMap.put(currentNode.getBoard(), null);    // no parent to the initial
-
-        // AStar algorithm. Will go until no more states to visit or goal is met.
-        // When goal is met, break.
-        while (!priorityQueue.isEmpty()) {
-            currentNode = priorityQueue.poll();
-            if (currentNode.getG() > gValue.get(currentNode.getBoard())) {
-                continue; // outdated version of this board
+            } else if (test == 3) {
+                // Exit
+                scanner.close();
+                return;
+            } else {
+                System.out.println("Invalid input.");
+                continue;
             }
 
-            // check each direction
-            if (currentNode.getH() == 0) {
-                break;
+            System.out.println("Select Input Method:\n[1] Random\n[2] File");
+            int method = scanner.nextInt();
+
+            if (method == 1) {
+                // Random
+            } else if (method == 2) {
+                // File
+
+            } else {
+                System.out.println("Invalid Input.");
+                continue;
             }
 
-            int zeroRow = currentNode.getZeroIndex() / 3;
-            int zeroCol = currentNode.getZeroIndex() % 3;
+            System.out.println("Select Solution Depth (2-20");
+            int depth = scanner.nextInt();
+
+            Node currentNode = generateRandomBoard(depth);
+            printBoard(currentNode.getBoard());
+
+            if (!checkSolvability(currentNode.getBoard())) {
+                System.out.println("Board is not solvable");
+                continue;
+            }
             
-            for (Direction d: Direction.values()) {
-                // make sure not on border
-                if (zeroRow + d.dr >= 0 && zeroRow + d.dr <= 2 && zeroCol + d.dc >= 0 && zeroCol + d.dc <= 2) {
-                    Node node = generateNeighborNode(currentNode, d);
+            Map<String, Integer> gValue = new HashMap<>();      // board -> g value
+            Map<String, String> parentMap = new HashMap<>();    // board -> parent board
 
-                    // If repeated node, replace key with smaller g value. Otherwise, add to hashmap.
-                    // In the case of repeated but larger g value, don't do anything.
-                    if (!gValue.containsKey(node.getBoard())) {
-                        gValue.put(node.getBoard(), node.getG());
-                        parentMap.put(node.getBoard(), currentNode.getBoard());
-                    } else if (node.getG() < gValue.get(node.getBoard())) {
-                        gValue.put(node.getBoard(), node.getG());
-                        parentMap.put(node.getBoard(), currentNode.getBoard());
+            // Change comparator to use F
+            PriorityQueue<Node> priorityQueue = new PriorityQueue<>((a, b) -> a.getF() - b.getF());
+
+            priorityQueue.add(currentNode);
+            gValue.put(currentNode.getBoard(), currentNode.getG());
+            String parentBoard = currentNode.getBoard();
+            parentMap.put(currentNode.getBoard(), null);    // no parent to the initial
+
+            // AStar algorithm. Will go until no more states to visit or goal is met.
+            // When goal is met, break.
+            while (!priorityQueue.isEmpty()) {
+                currentNode = priorityQueue.poll();
+                if (currentNode.getG() > gValue.get(currentNode.getBoard())) {
+                    continue; // outdated version of this board
+                }
+
+                // check each direction
+                if (currentNode.getH() == 0) {
+                    break;
+                }
+
+                int zeroRow = currentNode.getZeroRow();
+                int zeroCol = currentNode.getZeroCol();
+                
+                for (Direction d: Direction.values()) {
+                    // make sure not on border
+                    if (zeroRow + d.dr >= 0 && zeroRow + d.dr <= 2 && zeroCol + d.dc >= 0 && zeroCol + d.dc <= 2) {
+                        Node node = generateNeighborNode(currentNode, d);
+
+                        // If repeated node, replace key with smaller g value. Otherwise, add to hashmap.
+                        // In the case of repeated but larger g value, don't do anything.
+                        if (!gValue.containsKey(node.getBoard())) {
+                            gValue.put(node.getBoard(), node.getG());
+                            parentMap.put(node.getBoard(), currentNode.getBoard());
+                        } else if (node.getG() < gValue.get(node.getBoard())) {
+                            gValue.put(node.getBoard(), node.getG());
+                            parentMap.put(node.getBoard(), currentNode.getBoard());
+                        }
+                        // add both old and new nodes. the ones with smaller g will be skipped later on.
+                        priorityQueue.add(node);
                     }
-                    // add both old and new nodes. the ones with smaller g will be skipped later on.
-                    priorityQueue.add(node);
                 }
             }
+
+            // currentNode now holds the node with goal. 
+            // Need to figure out the path by retracing parents.
+            String sBoard = currentNode.getBoard();
+            ArrayList<String> path = new ArrayList<>();
+
+            while (sBoard != null) {
+                path.add(sBoard);
+                sBoard = parentMap.get(sBoard);
+            }
+
+            // add parent
+            path.add(parentBoard);
+
+            // Reverse path to get from original path to goal
+            Collections.reverse(path);
+
+            // Print path :D
+            for (String s : path) {
+                System.out.println("=============");
+                printBoard(s);
+            }
+
+            System.out.println("Total moves: " + path.size());
         }
-
-        // currentNode now holds the node with goal. 
-        // Need to figure out the path by retracing parents.
-        String sBoard = currentNode.getBoard();
-        ArrayList<String> path = new ArrayList<>();
-
-        while (sBoard != null) {
-            path.add(sBoard);
-            sBoard = parentMap.get(sBoard);
-        }
-
-        // add parent
-        path.add(parentBoard);
-
-        // Reverse path to get from original path to goal
-        Collections.reverse(path);
-
-        // Print path :D
-        for (String s : path) {
-            System.out.println("=============");
-            printBoard(s);
-        }
-
-        System.out.println("Total moves: " + path.size());
     }  
 
-    @SuppressWarnings("resource")
-    public static Node generateBoard () {
-        Scanner scanner = new Scanner(System.in);
+    public static int aStarH1(String board) {
+        return 0;
+    }
 
-        while (true) {
-            System.out.print("Enter board as 9 digits. E.g.(012345678 or 'random': ");
-            String input = scanner.nextLine();
-            ArrayList<Character> numbers = new ArrayList<>();
+    public static int aStarH2(String board) {
+        return 0;
+    }
 
-            // Random Input
-            if (input.equalsIgnoreCase("random")) {
-                for (char c = '0'; c < '9'; c++) {
-                    numbers.add(c);
+    public static Node generateRandomBoard (int depth) {
+        // Random Input
+        Set<String> previousBoards = new HashSet<>();
+        Node currentBoard = new Node("012345678", 0);
+        
+        int zeroRow;
+        int zeroCol; 
+
+        Direction[] directions = Direction.values();
+        int size = directions.length;
+        Direction direction;
+
+        for (int i = 0; i < depth; i++) {
+            previousBoards.add(currentBoard.getBoard());
+
+            zeroRow = currentBoard.getZeroRow();
+            zeroCol = currentBoard.getZeroCol();
+
+            // Randomize direction for next board
+            do {
+                direction = directions[ThreadLocalRandom.current().nextInt(size)];
+                if (!(zeroRow + direction.dr >= 0 && zeroRow + direction.dr <= 2 && zeroCol + direction.dc >= 0 && zeroCol + direction.dc <= 2)) {
+                    continue;
+                } 
+                Node node = generateNeighborNode(currentBoard, direction);
+                if (previousBoards.contains(node.getBoard())) {
+                    continue;
                 }
-                Collections.shuffle(numbers);
-                StringBuilder sb = new StringBuilder(9);
-                for (int i = 0; i < numbers.size(); i++) {
-                    sb.append(numbers.get(i));
-                }
-                return new Node(sb.toString(), 0);
-            } 
 
-            // Input validation
-            if (input.length() != 9) {
-                System.out.println("Error: Input must be exactly 9 numbers");
-                continue;
-            }
-
-            boolean[] seen = new boolean[9];
-            boolean ok = true;
-            for (int i = 0; i < input.length(); i++) {
-                char c = input.charAt(i);
-                if (c < '0' || c > '8') {
-                    ok = false;
-                    break;
-                }
-                int v = c - '0';
-                if (seen[v]) {
-                    ok = false;
-                    break;
-                }
-                seen[v] = true;
-            }
-
-            if (!ok) {
-                System.out.println("Error: There must be no repeating values");
-                continue;
-            }
-            
-            return new Node(input, 0);
+                currentBoard = node;
+                previousBoards.add(currentBoard.getBoard());
+                break;
+            } while (true);
         }
+
+        return currentBoard;
     }
 
     public static Node generateNeighborNode(Node node, Direction d) {
@@ -215,15 +248,15 @@ class Node {
         return board;
     }
 
-    public Integer getF() {
+    public int getF() {
         return f;
     }
 
-    public Integer getG() {
+    public int getG() {
         return g;
     }
 
-    public Integer getH() {
+    public int getH() {
         return h;
     }
 
@@ -249,11 +282,19 @@ class Node {
         return totalDist;
     }
 
-    public Integer getZeroIndex() {
+    public int getZeroIndex() {
         return zeroIndex;
     }
 
-    public Integer findZeroIndex() {
+    public int getZeroRow() {
+        return zeroIndex / 3;
+    }
+
+    public int getZeroCol() {
+        return zeroIndex % 3;
+    }
+
+    public int findZeroIndex() {
         for (int i = 0; i < board.length(); i++) {
             if (board.charAt(i) == '0') {
                 zeroIndex = i;
