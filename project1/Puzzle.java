@@ -7,11 +7,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Queue;
 
 public class Puzzle {
     public static void main (String[] args) {
+        // Build BFS Map of all boards to be able to find boards of optimal depths.
+        Map<String, Integer> depthMap = buildDepthMap();
+
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("Select:\n[1] Single Test Puzzle\n[2] Multi-Test Puzzle\n[3] Exit");
@@ -60,12 +65,13 @@ public class Puzzle {
 
             System.out.println("Select Solution Depth (2-20)");
             int depth = scanner.nextInt();
-            Node initialBoard = generateRandomBoard(depth);
+            String initialBoardString = getBoardAtDepth(depthMap, depth);
+            Node initialBoard = new Node (initialBoardString, 0);
 
             System.out.println("Puzzle:");
             printBoard(initialBoard.getBoard());
 
-            System.out.println("Select H Function:\n[1] H1\n[2] H2");
+            System.out.println("\nSelect H Function:\n[1] H1\n[2] H2");
             int hFunction = scanner.nextInt();
 
             while (true) {
@@ -77,7 +83,8 @@ public class Puzzle {
                     } else {
                         int totalSearchCost = 0;
                         for (int i = 0; i < numberOfTests; i++) {
-                            Node board = generateRandomBoard(depth);
+                            String boardString = getBoardAtDepth(depthMap, depth);
+                            Node board = new Node (boardString, 0);
                             totalSearchCost += aStarH2(board, false);
                         }
                         System.out.println("Average Search Cost: " + totalSearchCost);
@@ -100,7 +107,6 @@ public class Puzzle {
     public static int aStarH2(Node node, boolean individual) {
         Node currentNode = node;
         int count = 0;
-        printBoard(currentNode.getBoard());
 
         if (!checkSolvability(currentNode.getBoard())) {
             System.out.println("Board is not solvable");
@@ -172,7 +178,7 @@ public class Puzzle {
         // Print path :D
         if (individual) {
             for (int i = 0; i < path.size(); i++) {
-                System.out.println("Step " + (i + 1));
+                System.out.println("Step: " + (i + 1));
                 printBoard(path.get(i));
                 System.out.println();
             }
@@ -185,39 +191,91 @@ public class Puzzle {
         return 0;
     }
 
-    public static Node generateRandomBoard (int depth) {
-        // Random Input
-        Set<String> previousBoards = new HashSet<>();
-        Node currentBoard = new Node("012345678", 0);
+    public static Map<String, Integer> buildDepthMap() {
+        Map<String, Integer> depthMap = new HashMap<>();
+        Queue<Node> queue = new LinkedList<>();
         
-        int zeroRow;
-        int zeroCol; 
+        Node start = new Node("012345678", 0);
 
-        Direction[] directions = Direction.values();
+        queue.add(start);
+        depthMap.put(start.getBoard(), 0);
 
-        for (int i = 0; i < depth; i++) {
-            while (true) {
-                Direction direction = directions[ThreadLocalRandom.current().nextInt(directions.length)];
+        while(!queue.isEmpty()) {
+            Node currentNode = queue.poll();
+            int currentDepth = depthMap.get(currentNode.getBoard());
 
-                zeroRow = currentBoard.getZeroRow();
-                zeroCol = currentBoard.getZeroCol();
+            int zeroRow = currentNode.getZeroRow();
+            int zeroCol = currentNode.getZeroCol();
 
-                int nRow = zeroRow + direction.dr;
-                int nCol = zeroCol + direction.dc;
+            // Check each direction
+            for (Direction d : Direction.values()) {
+                int newRow = zeroRow + d.dr;
+                int newCol = zeroCol + d.dc;
 
-                if (nRow < 0 || nRow > 2 || nCol < 0 || nCol > 2) continue;
+                if (newRow < 0 || newRow > 2 || newCol < 0 || newCol > 2) continue;
 
-                Node nextNode = generateNeighborNode(currentBoard, direction);
-                if (previousBoards.contains(nextNode.getBoard())) continue;
+                Node neighborNode = generateNeighborNode(currentNode, d);
 
-                currentBoard = nextNode;
-                previousBoards.add(currentBoard.getBoard());
-                break;
+                if (!depthMap.containsKey(neighborNode.getBoard())) {
+                    depthMap.put(neighborNode.getBoard(), currentDepth + 1);
+                    queue.add(neighborNode);
+                }
             }
         }
 
-        return currentBoard;
+        return depthMap;
     }
+
+    public static String getBoardAtDepth (Map<String, Integer> depthMap, int depth) {
+        ArrayList<String> boards = new ArrayList<>();
+
+        for (Map.Entry<String, Integer> entry : depthMap.entrySet()) {
+            if (entry.getValue() == depth) {
+                boards.add(entry.getKey());
+            }
+        }
+
+        if (boards.isEmpty()) {
+            System.out.println("No boards of depth " + depth);
+            return null;
+        }
+
+        return boards.get(ThreadLocalRandom.current().nextInt(boards.size()));
+    }
+
+    // public static Node generateRandomBoard (int depth) {
+        // // Random Input
+        // Set<String> previousBoards = new HashSet<>();
+        // Node currentBoard = new Node("012345678", 0);
+        
+        // int zeroRow;
+        // int zeroCol; 
+
+        // Direction[] directions = Direction.values();
+
+        // for (int i = 0; i < depth; i++) {
+        //     while (true) {
+        //         Direction direction = directions[ThreadLocalRandom.current().nextInt(directions.length)];
+
+        //         zeroRow = currentBoard.getZeroRow();
+        //         zeroCol = currentBoard.getZeroCol();
+
+        //         int nRow = zeroRow + direction.dr;
+        //         int nCol = zeroCol + direction.dc;
+
+        //         if (nRow < 0 || nRow > 2 || nCol < 0 || nCol > 2) continue;
+
+        //         Node nextNode = generateNeighborNode(currentBoard, direction);
+        //         if (previousBoards.contains(nextNode.getBoard())) continue;
+
+        //         currentBoard = nextNode;
+        //         previousBoards.add(currentBoard.getBoard());
+        //         break;
+        //     }
+        // }
+
+        // return currentBoard;
+    // }
 
     public static Node generateNeighborNode(Node node, Direction d) {
         char[] board = node.getBoard().toCharArray();
