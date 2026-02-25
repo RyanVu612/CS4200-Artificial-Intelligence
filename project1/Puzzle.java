@@ -50,17 +50,11 @@ public class Puzzle {
                 }
             }
 
-            System.out.println("Select Input Method:\n[1] Random\n[2] File");
+            System.out.println("Select Input Method:\n[1] Random\n[2] File\n[3] System.in");
             int method = scanner.nextInt();
 
             while (true) {
-                if (method == 1) {
-                    // random board
-                    random = true;
-                    break;
-                } else if (method == 2) {
-                    // from file
-                    random = false;
+                if (method >= 1 && method <= 3) {
                     break;
                 } else {
                     System.out.println("Invalid Input.");
@@ -68,7 +62,7 @@ public class Puzzle {
                 }
             }
 
-            if (random) {
+            if (method == 1) {
                 System.out.println("Select Solution Depth (2-20)");
 
                 while (true) {
@@ -102,14 +96,14 @@ public class Puzzle {
 
                 if (numberOfTests == 1) {
                     if (hInput == 1) {
-                        int searchCost = aStarIndividual(initialBoard, true);
+                        int searchCost = aStarIndividual(initialBoard, true, true);
                         System.out.println("Search Cost: " + searchCost);
                     } else if (hInput == 2) {
-                        int searchCost = aStarIndividual(initialBoard, false);
+                        int searchCost = aStarIndividual(initialBoard, false, true);
                         System.out.println("Search Cost: " + searchCost);
                     } else {
-                        int searchCostH1 = aStarIndividual(initialBoard, true);
-                        int searchCostH2 = aStarIndividual(initialBoard, false);
+                        int searchCostH1 = aStarIndividual(initialBoard, true, true);
+                        int searchCostH2 = aStarIndividual(initialBoard, false, false);
                         System.out.println("Search Cost for H1: " + searchCostH1);
                         System.out.println("Search Cost for H2: " + searchCostH2);
                     }
@@ -135,7 +129,7 @@ public class Puzzle {
                         System.out.println("Average Search Cost for H2: " + ((double) totalSearchCostH2 / numberOfTests));
                     }
                 }
-            } else {
+            } else if (method == 2) {
                 // File input
                 scanner.nextLine();
                 System.out.print("Enter file name: ");
@@ -172,12 +166,13 @@ public class Puzzle {
                         if (board.length() == 9) {
                             // Full board formed
                             if (numberOfTests == 1) {
-                                if (hInput == 1 || hInput == 3) {
-                                    totalSearchCostH1 = aStarIndividual(new Node(board, 0), true);
-                                }
-
-                                if (hInput == 2 || hInput == 3) {
-                                    totalSearchCostH2 = aStarIndividual(new Node(board, 0), false);
+                                if (hInput == 1) {
+                                    totalSearchCostH1 = aStarIndividual(new Node(board, 0), true, true);
+                                } else if (hInput == 2) {
+                                    totalSearchCostH2 = aStarIndividual(new Node(board, 0), false, true);
+                                } else {
+                                    totalSearchCostH1 = aStarIndividual(new Node(board, 0), true, false);
+                                    totalSearchCostH2 = aStarIndividual(new Node(board, 0), false, true);
                                 }
                                 break;
                             } else {
@@ -219,11 +214,77 @@ public class Puzzle {
                         System.out.println("Average Search Cost for H2: " + totalSearchCostH2 / tests);
                     }
                 }
+            } else {
+                // User input
+                System.out.println("Enter your board: ");
+
+                StringBuilder sb = new StringBuilder();
+
+                for (int i = 0; i < 9; i++) {
+                    sb.append(scanner.nextInt());
+                }
+
+                Node initialBoard = new Node (sb.toString(), 0);
+
+                System.out.println("\nSelect H Function:\n[1] H1\n[2] H2\n[3] Compare H1 and H2");
+                int hInput = scanner.nextInt();
+
+                while (true) {
+                    if (hInput >= 1 && hInput <= 3) {
+                        break;
+                    } else {
+                        System.out.println("Invalid input");
+                        continue;
+                    }
+                }
+
+                if (numberOfTests == 1) {
+                    if (hInput == 1) {
+                        int searchCost = aStarIndividual(initialBoard, true, true);
+                        System.out.println("Search Cost: " + searchCost);
+                    } else if (hInput == 2) {
+                        int searchCost = aStarIndividual(initialBoard, false, true);
+                        System.out.println("Search Cost: " + searchCost);
+                    } else {
+                        int searchCostH1 = aStarIndividual(initialBoard, true, false);
+                        int searchCostH2 = aStarIndividual(initialBoard, false, true);
+                        System.out.println("Search Cost for H1: " + searchCostH1);
+                        System.out.println("Search Cost for H2: " + searchCostH2);
+                    }
+                } else {
+                    int totalSearchCostH1 = 0;
+                    int totalSearchCostH2 = 0;
+                    for (int i = 0; i < numberOfTests; i++) {
+                        System.out.println("Enter the next board: ");
+
+                        sb.setLength(0);
+                        for (int j = 0; j < 9; j++) {
+                            sb.append(scanner.nextInt());
+                        }
+
+                        String boardString = sb.toString();
+                        if (hInput == 1 || hInput == 3) {
+                            totalSearchCostH1 += aStarMultiple(new Node (boardString, 0), true);
+                        } 
+                        
+                        if (hInput == 2 || hInput == 3) {
+                            totalSearchCostH2 += aStarMultiple(new Node (boardString, 0), false);
+                        } 
+                    }
+
+                    if (hInput == 1 || hInput == 3) {
+                        System.out.println("Average Search Cost for H1: " + ((double) totalSearchCostH1 / numberOfTests));
+                    }
+
+                    if (hInput == 2 || hInput == 3) {
+                        System.out.println("Average Search Cost for H2: " + ((double) totalSearchCostH2 / numberOfTests));
+                    }
+                }
             }
         }
     }  
 
-    public static int aStarIndividual(Node node, boolean h1) {
+    public static int aStarIndividual(Node node, boolean h1, boolean print) {
         Node currentNode = node;
 
         if (h1) {
@@ -311,10 +372,12 @@ public class Puzzle {
         Collections.reverse(path);
 
         // Print path :D
-        for (int i = 0; i < path.size(); i++) {
-            System.out.println("Step: " + (i));
-            printBoard(path.get(i));
-            System.out.println();
+        if (print) {
+            for (int i = 0; i < path.size(); i++) {
+                System.out.println("Step: " + (i));
+                printBoard(path.get(i));
+                System.out.println();
+            }
         }
 
         return count;
