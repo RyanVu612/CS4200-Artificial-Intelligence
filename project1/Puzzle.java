@@ -3,6 +3,7 @@ package project1;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,13 +17,15 @@ public class Puzzle {
     public static void main (String[] args) {
         // Build BFS Map of all boards to be able to find boards of optimal depths.
         Map<String, Integer> depthMap = buildDepthMap();
+        boolean random;
+        boolean h1;
+        int numberOfTests;
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("Select:\n[1] Single Test Puzzle\n[2] Multi-Test Puzzle\n[3] Exit");
             int test = scanner.nextInt();
 
-            int numberOfTests;
             while (true) {
                 if (test == 1) {
                     // Single Test Puzzle
@@ -52,10 +55,10 @@ public class Puzzle {
 
             while (true) {
                 if (method == 1) {
-                    // Random
+                    random = true;
                     break;
                 } else if (method == 2) {
-                    // File
+                    random = false;
                     break;
                 } else {
                     System.out.println("Invalid Input.");
@@ -65,37 +68,43 @@ public class Puzzle {
 
             System.out.println("Select Solution Depth (2-20)");
             int depth = scanner.nextInt();
-            String initialBoardString = getBoardAtDepth(depthMap, depth);
-            Node initialBoard = new Node (initialBoardString, 0);
 
-            System.out.println("Puzzle:");
-            printBoard(initialBoard.getBoard());
+            if (random) {
+                String initialBoardString = getBoardAtDepth(depthMap, depth);
+                Node initialBoard = new Node (initialBoardString, 0);
+                System.out.println("Puzzle:");
+                printBoard(initialBoard.getBoard());
 
-            System.out.println("\nSelect H Function:\n[1] H1\n[2] H2");
-            int hFunction = scanner.nextInt();
+                System.out.println("\nSelect H Function:\n[1] H1\n[2] H2");
+                int hFunction = scanner.nextInt();
 
-            while (true) {
-                if (hFunction == 1) {
-                    break;
-                } else if (hFunction == 2) {
-                    if (numberOfTests == 1) {
-                        aStarH2(initialBoard, true);
+                while (true) {
+                    if (hFunction == 1) {
+                        h1 = true;
+                        break;
+                    } else if (hFunction == 2) {
+                        h1 = false;
+                        break;
                     } else {
-                        int totalSearchCost = 0;
-                        for (int i = 0; i < numberOfTests; i++) {
-                            String boardString = getBoardAtDepth(depthMap, depth);
-                            Node board = new Node (boardString, 0);
-                            totalSearchCost += aStarH2(board, false);
-                        }
-                        System.out.println("Average Search Cost: " + totalSearchCost);
+                        System.out.println("Invalid input");
+                        continue;
                     }
-                    break;
-                } else if (hFunction == 3) {
-                    break;
-                } else {
-                    System.out.println("Invalid input");
-                    continue;
                 }
+
+                if (numberOfTests == 1) {
+                    int searchCost = aStarIndividual(initialBoard, h1);
+                    System.out.println("Search Cost: " + searchCost);
+                } else {
+                    int totalSearchCost = 0;
+                    for (int i = 0; i < numberOfTests; i++) {
+                        String boardString = getBoardAtDepth(depthMap, depth);
+                        Node board = new Node (boardString, 0);
+                        totalSearchCost += aStarIndividual(board, h1);
+                    }
+                    System.out.println("Average Search Cost: " + ((double) totalSearchCost / numberOfTests));
+                }
+            } else {
+                // file input
             }
         }
     }  
@@ -104,12 +113,20 @@ public class Puzzle {
         return 0;
     }
 
-    public static int aStarH2(Node node, boolean individual) {
+    public static int aStarIndividual(Node node, boolean h1) {
         Node currentNode = node;
+
+        if (h1) {
+            currentNode.calculateH1();
+        } else {
+            currentNode.calculateH2();
+        }
+
         int count = 0;
 
         if (!checkSolvability(currentNode.getBoard())) {
             System.out.println("Board is not solvable");
+            return -1;
         }
         
         Map<String, Integer> gValue = new HashMap<>();      // board -> g value
@@ -142,6 +159,13 @@ public class Puzzle {
                 // make sure not on border
                 if (zeroRow + d.dr >= 0 && zeroRow + d.dr <= 2 && zeroCol + d.dc >= 0 && zeroCol + d.dc <= 2) {
                     Node neighborNode = generateNeighborNode(currentNode, d);
+                    
+                    if (h1) {
+                        neighborNode.calculateH1();
+                    } else {
+                        neighborNode.calculateH2();
+                    }
+
                     count++;
 
                     // If repeated node, replace key with smaller g value. Otherwise, add to hashmap.
@@ -159,6 +183,11 @@ public class Puzzle {
             }
         }
 
+        if (currentNode.getH() != 0) {
+            System.out.println("No solution found.");
+            return count;
+        }
+
         // currentNode now holds the node with goal. 
         // Need to figure out the path by retracing parents.
         String sBoard = currentNode.getBoard();
@@ -169,19 +198,14 @@ public class Puzzle {
             sBoard = parentMap.get(sBoard);
         }
 
-        // add parent
-        path.add(parentBoard);
-
         // Reverse path to get from original path to goal
         Collections.reverse(path);
 
         // Print path :D
-        if (individual) {
-            for (int i = 0; i < path.size(); i++) {
-                System.out.println("Step: " + (i + 1));
-                printBoard(path.get(i));
-                System.out.println();
-            }
+        for (int i = 0; i < path.size(); i++) {
+            System.out.println("Step: " + (i));
+            printBoard(path.get(i));
+            System.out.println();
         }
 
         return count;
@@ -242,40 +266,6 @@ public class Puzzle {
 
         return boards.get(ThreadLocalRandom.current().nextInt(boards.size()));
     }
-
-    // public static Node generateRandomBoard (int depth) {
-        // // Random Input
-        // Set<String> previousBoards = new HashSet<>();
-        // Node currentBoard = new Node("012345678", 0);
-        
-        // int zeroRow;
-        // int zeroCol; 
-
-        // Direction[] directions = Direction.values();
-
-        // for (int i = 0; i < depth; i++) {
-        //     while (true) {
-        //         Direction direction = directions[ThreadLocalRandom.current().nextInt(directions.length)];
-
-        //         zeroRow = currentBoard.getZeroRow();
-        //         zeroCol = currentBoard.getZeroCol();
-
-        //         int nRow = zeroRow + direction.dr;
-        //         int nCol = zeroCol + direction.dc;
-
-        //         if (nRow < 0 || nRow > 2 || nCol < 0 || nCol > 2) continue;
-
-        //         Node nextNode = generateNeighborNode(currentBoard, direction);
-        //         if (previousBoards.contains(nextNode.getBoard())) continue;
-
-        //         currentBoard = nextNode;
-        //         previousBoards.add(currentBoard.getBoard());
-        //         break;
-        //     }
-        // }
-
-        // return currentBoard;
-    // }
 
     public static Node generateNeighborNode(Node node, Direction d) {
         char[] board = node.getBoard().toCharArray();
@@ -342,8 +332,6 @@ class Node {
     public Node (String board, int g) {
         this.board = board;
         this.g = g;
-        h = calculateH();
-        f = g + h;
         zeroIndex = findZeroIndex();
     }
 
@@ -363,12 +351,24 @@ class Node {
         return h;
     }
 
-    public int calculateH() {
+    public int calculateH1() {
+        // calculate the number of misplaced tiles
+        int count = 0;
+        for (int i = 0; i < board.length(); i++) {
+            if (board.charAt(i) != '0' && board.charAt(i) != (char)(i + '0')) {
+                count++;
+            }
+        }
+        h = count;
+        f = g + h;
+        return count;
+    }
+
+    public int calculateH2() {
         // calculate the distance each tile is from its goal position. (col + row)
         int totalDist = 0;
-        int value;
         for (int i = 0; i < board.length(); i++) {
-            value = Character.getNumericValue(board.charAt(i));
+            int value = Character.getNumericValue(board.charAt(i));
 
             //skip 0 since empty spot
             if (value == 0) {
@@ -377,11 +377,18 @@ class Node {
 
             // Row dist = i / 3
             // Col dist = i % 3
+            int goalIndex = value;
+            int goalRow = goalIndex / 3;
+            int goalCol = goalIndex % 3;
+
+            int currentRow = i / 3;
+            int currentCol = i % 3;
 
             // Add the dist for each tile to total distance
-            totalDist += (Math.abs(value / 3 - i / 3) + Math.abs(value % 3 - i % 3));
+            totalDist += (Math.abs(goalRow - currentRow) + Math.abs(goalCol - currentCol));
         }
-
+        h = totalDist;
+        f = g + h;
         return totalDist;
     }
 
