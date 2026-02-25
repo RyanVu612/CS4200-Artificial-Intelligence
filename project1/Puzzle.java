@@ -1,13 +1,13 @@
 package project1;
 
 import java.util.Scanner;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -18,6 +18,7 @@ public class Puzzle {
         // Build BFS Map of all boards to be able to find boards of optimal depths.
         Map<String, Integer> depthMap = buildDepthMap();
         boolean random;
+        int depth;
         boolean h1;
         int numberOfTests;
 
@@ -55,9 +56,11 @@ public class Puzzle {
 
             while (true) {
                 if (method == 1) {
+                    // random board
                     random = true;
                     break;
                 } else if (method == 2) {
+                    // from file
                     random = false;
                     break;
                 } else {
@@ -66,10 +69,18 @@ public class Puzzle {
                 }
             }
 
-            System.out.println("Select Solution Depth (2-20)");
-            int depth = scanner.nextInt();
-
             if (random) {
+                System.out.println("Select Solution Depth (2-20)");
+
+                while (true) {
+                    depth = scanner.nextInt();
+                    
+                    if (depth >= 2 && depth <= 20) {
+                        break;
+                    }
+                    System.out.println("Invalid depth size.");
+                }
+
                 String initialBoardString = getBoardAtDepth(depthMap, depth);
                 Node initialBoard = new Node (initialBoardString, 0);
                 System.out.println("Puzzle:");
@@ -98,20 +109,76 @@ public class Puzzle {
                     int totalSearchCost = 0;
                     for (int i = 0; i < numberOfTests; i++) {
                         String boardString = getBoardAtDepth(depthMap, depth);
-                        Node board = new Node (boardString, 0);
-                        totalSearchCost += aStarIndividual(board, h1);
+                        totalSearchCost += aStarMultiple(new Node (boardString, 0), h1);
                     }
                     System.out.println("Average Search Cost: " + ((double) totalSearchCost / numberOfTests));
                 }
             } else {
-                // file input
+                // File input
+                scanner.nextLine();
+                System.out.print("Enter file name: ");
+                String fileName = scanner.nextLine();
+                int tests = 0;
+
+                System.out.println("\nSelect H Function:\n[1] H1\n[2] H2");
+                int hFunction = scanner.nextInt();
+
+                while (true) {
+                    if (hFunction == 1) {
+                        h1 = true;
+                        break;
+                    } else if (hFunction == 2) {
+                        h1 = false;
+                        break;
+                    } else {
+                        System.out.println("Invalid input");
+                        continue;
+                    }
+                }
+                
+                int totalSearchCost = 0;
+                try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+                    String line;
+                    String board = "";
+                    int count = 0;
+                    while ((line = br.readLine()) != null) {
+                        
+                        for (int i = 0; i < line.length(); i++) {
+                            char c = line.charAt(i);
+
+                            if (Character.isDigit(c)) {
+                                board += c;
+                            }
+                        }
+
+                        if (board.length() == 9) {
+                            // Full board formed
+                            if (numberOfTests == 1) {
+                                totalSearchCost = aStarIndividual(new Node(board, 0), h1);
+                                break;
+                            } else {
+                                totalSearchCost += aStarMultiple(new Node(board, 0), h1);
+                                board = "";
+                                tests++;
+                                if (tests >= numberOfTests) {
+                                    break;
+                                }
+                            }
+                        }
+                        count++;
+                    }
+                } catch (IOException e){
+                    e.printStackTrace();
+                }
+
+                if (numberOfTests == 1) {
+                    System.out.println("Total Search Cost: " + totalSearchCost);
+                } else {
+                    System.out.println("Average Search Cost: " + totalSearchCost / tests);
+                }
             }
         }
     }  
-
-    public static int aStarH1Individual(String board) {
-        return 0;
-    }
 
     public static int aStarIndividual(Node node, boolean h1) {
         Node currentNode = node;
@@ -137,7 +204,6 @@ public class Puzzle {
 
         priorityQueue.add(currentNode);
         gValue.put(currentNode.getBoard(), currentNode.getG());
-        String parentBoard = currentNode.getBoard();
         parentMap.put(currentNode.getBoard(), null);    // no parent to the initial
 
         // AStar algorithm. Will go until no more states to visit or goal is met.
@@ -211,8 +277,81 @@ public class Puzzle {
         return count;
     }
 
-    public static int aStarH2Multiple(int depth) {
-        return 0;
+    public static int aStarMultiple(Node node, boolean h1) {
+        Node currentNode = node;
+
+        if (h1) {
+            currentNode.calculateH1();
+        } else {
+            currentNode.calculateH2();
+        }
+
+        int count = 0;
+
+        if (!checkSolvability(currentNode.getBoard())) {
+            System.out.println("Board is not solvable");
+            return -1;
+        }
+        
+        Map<String, Integer> gValue = new HashMap<>();      // board -> g value
+        Map<String, String> parentMap = new HashMap<>();    // board -> parent board
+
+        // Change comparator to use F
+        PriorityQueue<Node> priorityQueue = new PriorityQueue<>((a, b) -> a.getF() - b.getF());
+
+        priorityQueue.add(currentNode);
+        gValue.put(currentNode.getBoard(), currentNode.getG());
+        parentMap.put(currentNode.getBoard(), null);    // no parent to the initial
+
+        // AStar algorithm. Will go until no more states to visit or goal is met.
+        // When goal is met, break.
+        while (!priorityQueue.isEmpty()) {
+            currentNode = priorityQueue.poll();
+            if (currentNode.getH() == 0) {
+                break;
+            }
+
+            if (currentNode.getG() > gValue.get(currentNode.getBoard())) {
+                continue; // outdated version of this board
+            }
+
+            int zeroRow = currentNode.getZeroRow();
+            int zeroCol = currentNode.getZeroCol();
+            
+            for (Direction d: Direction.values()) {
+                // make sure not on border
+                if (zeroRow + d.dr >= 0 && zeroRow + d.dr <= 2 && zeroCol + d.dc >= 0 && zeroCol + d.dc <= 2) {
+                    Node neighborNode = generateNeighborNode(currentNode, d);
+                    
+                    if (h1) {
+                        neighborNode.calculateH1();
+                    } else {
+                        neighborNode.calculateH2();
+                    }
+
+                    count++;
+
+                    // If repeated node, replace key with smaller g value. Otherwise, add to hashmap.
+                    // In the case of repeated but larger g value, don't do anything.
+                    if (!gValue.containsKey(neighborNode.getBoard())) {
+                        gValue.put(neighborNode.getBoard(), neighborNode.getG());
+                        parentMap.put(neighborNode.getBoard(), currentNode.getBoard());
+                    } else if (neighborNode.getG() < gValue.get(neighborNode.getBoard())) {
+                        gValue.put(neighborNode.getBoard(), neighborNode.getG());
+                        parentMap.put(neighborNode.getBoard(), currentNode.getBoard());
+                    }
+                    // add both old and new nodes. the ones with smaller g will be skipped later on.
+                    priorityQueue.add(neighborNode);
+                }
+            }
+        }
+
+        if (currentNode.getH() != 0) {
+            System.out.println("No solution found.");
+            return count;
+        }
+
+        return count;
     }
 
     public static Map<String, Integer> buildDepthMap() {
