@@ -83,8 +83,11 @@ public class Puzzle {
 
                 String initialBoardString = getBoardAtDepth(depthMap, depth);
                 Node initialBoard = new Node (initialBoardString, 0);
-                System.out.println("Puzzle:");
-                printBoard(initialBoard.getBoard());
+                
+                if (numberOfTests == 1) {
+                    System.out.println("Puzzle:");
+                    printBoard(initialBoard.getBoard());
+                }
 
                 System.out.println("\nSelect H Function:\n[1] H1\n[2] H2");
                 int hFunction = scanner.nextInt();
