@@ -17,7 +17,6 @@ public class Puzzle {
     public static void main (String[] args) {
         // Build BFS Map of all boards to be able to find boards of optimal depths.
         Map<String, Integer> depthMap = buildDepthMap();
-        boolean random;
         int depth;
         int numberOfTests;
 
