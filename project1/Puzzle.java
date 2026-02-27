@@ -97,10 +97,10 @@ public class Puzzle {
                 if (numberOfTests == 1) {
                     if (hInput == 1) {
                         int searchCost = aStarIndividual(initialBoard, true, true);
-                        System.out.println("Search Cost: " + searchCost);
+                        System.out.println("Search Cost for H1: " + searchCost);
                     } else if (hInput == 2) {
                         int searchCost = aStarIndividual(initialBoard, false, true);
-                        System.out.println("Search Cost: " + searchCost);
+                        System.out.println("Search Cost for H2: " + searchCost);
                     } else {
                         int searchCostH1 = aStarIndividual(initialBoard, true, true);
                         int searchCostH2 = aStarIndividual(initialBoard, false, false);
