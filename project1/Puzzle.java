@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -32,7 +33,7 @@ public class Puzzle {
                     break;
                 } else if (test == 2) {
                     // Multi-Test Puzzle
-                    System.out.println("Enter number of tests: (1 - 100)");
+                    System.out.println("Enter number of tests (1 - 100): ");
                     numberOfTests = scanner.nextInt();
                     if (numberOfTests < 1 || numberOfTests > 100) {
                         System.out.println("Invalid input.");
@@ -62,7 +63,7 @@ public class Puzzle {
             }
 
             if (method == 1) {
-                System.out.println("Select Solution Depth (2-20)");
+                System.out.println("Select Solution Depth (2-20): ");
 
                 while (true) {
                     depth = scanner.nextInt();
@@ -219,8 +220,22 @@ public class Puzzle {
 
                 StringBuilder sb = new StringBuilder();
 
-                for (int i = 0; i < 9; i++) {
-                    sb.append(scanner.nextInt());
+                while (true) {
+                    boolean valid = true;
+                    HashSet<Integer> seen = new HashSet<>();
+                    for (int i = 0; i < 9; i++) {
+                        int j = scanner.nextInt();
+                        if (j < 0 || j > 8) valid = false;
+                        seen.add(j);
+                        sb.append(j);
+                    }
+
+                    if (seen.size() < 9 || !valid) {
+                        System.out.println("Invalid board. Enter new board: ");
+                        continue;
+                    }
+
+                    break;
                 }
 
                 Node initialBoard = new Node (sb.toString(), 0);
