@@ -95,38 +95,70 @@ public class Puzzle {
                 }
 
                 if (numberOfTests == 1) {
+                    double time1Ms = 0;
+                    double time2Ms = 0;
                     if (hInput == 1) {
+                        double start = System.nanoTime();
                         int searchCost = aStarIndividual(initialBoard, true, true);
+                        double end = System.nanoTime();
+                        time1Ms = (end - start) / 1000000.0;
+
                         System.out.println("Search Cost for H1: " + searchCost);
+                        System.out.println("Search time for H1: " + time1Ms + "ms");
                     } else if (hInput == 2) {
+                        double start = System.nanoTime();
                         int searchCost = aStarIndividual(initialBoard, false, true);
+                        double end = System.nanoTime();
+                        time2Ms = (end - start) / 1000000.0;
+
                         System.out.println("Search Cost for H2: " + searchCost);
+                        System.out.println("Search time for H2: " + time2Ms + "ms");
                     } else {
+                        double start = System.nanoTime();
                         int searchCostH1 = aStarIndividual(initialBoard, true, true);
-                        int searchCostH2 = aStarIndividual(initialBoard, false, false);
+                        double end = System.nanoTime();
+                        time1Ms = (end - start) / 1000000.0;
+
+                        start = System.nanoTime();
+                        int searchCostH2 = aStarIndividual(initialBoard, false, true);
+                        end = System.nanoTime();
+                        time2Ms = (end - start) / 1000000.0;
+
                         System.out.println("Search Cost for H1: " + searchCostH1);
+                        System.out.println("Search Time for H1: " + time1Ms + "ms");
                         System.out.println("Search Cost for H2: " + searchCostH2);
+                        System.out.println("Search Time for H2: " + time2Ms + "ms");
                     }
                 } else {
                     int totalSearchCostH1 = 0;
                     int totalSearchCostH2 = 0;
+                    double time1Ms = 0;
+                    double time2Ms = 0;
                     for (int i = 0; i < numberOfTests; i++) {
                         String boardString = getBoardAtDepth(depthMap, depth);
                         if (hInput == 1 || hInput == 3) {
+                            double start = System.nanoTime();
                             totalSearchCostH1 += aStarMultiple(new Node (boardString, 0), true);
+                            double end = System.nanoTime();
+                            time1Ms = (end - start) / 1000000.0;
                         } 
                         
                         if (hInput == 2 || hInput == 3) {
+                            double start = System.nanoTime();
                             totalSearchCostH2 += aStarMultiple(new Node (boardString, 0), false);
+                            double end = System.nanoTime();
+                            time2Ms = (end - start) / 1000000.0;
                         } 
                     }
 
                     if (hInput == 1 || hInput == 3) {
                         System.out.println("Average Search Cost for H1: " + ((double) totalSearchCostH1 / numberOfTests));
+                        System.out.println("Average Search Time for H1: " + time1Ms + "ms");
                     }
 
                     if (hInput == 2 || hInput == 3) {
                         System.out.println("Average Search Cost for H2: " + ((double) totalSearchCostH2 / numberOfTests));
+                        System.out.println("Average Search Time for H2: " + time2Ms + "ms");
                     }
                 }
             } else if (method == 2) {
@@ -150,6 +182,8 @@ public class Puzzle {
                 
                 int totalSearchCostH1 = 0;
                 int totalSearchCostH2 = 0;
+                double totalTime1Ms = 0;
+                double totalTime2Ms = 0;
                 try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
                     String line;
                     String board = "";
@@ -167,21 +201,40 @@ public class Puzzle {
                             // Full board formed
                             if (numberOfTests == 1) {
                                 if (hInput == 1) {
+                                    double start = System.nanoTime();
                                     totalSearchCostH1 = aStarIndividual(new Node(board, 0), true, true);
+                                    double end = System.nanoTime();
+                                    totalTime1Ms += (end - start) / 1000000.0;
                                 } else if (hInput == 2) {
+                                    double start = System.nanoTime();
                                     totalSearchCostH2 = aStarIndividual(new Node(board, 0), false, true);
+                                    double end = System.nanoTime();
+                                    totalTime2Ms += (end - start) / 1000000.0;
                                 } else {
+                                    double start = System.nanoTime();
                                     totalSearchCostH1 = aStarIndividual(new Node(board, 0), true, false);
+                                    double end = System.nanoTime();
+                                    totalTime1Ms += (end - start) / 1000000.0;
+
+                                    start = System.nanoTime();
                                     totalSearchCostH2 = aStarIndividual(new Node(board, 0), false, true);
+                                    end = System.nanoTime();
+                                    totalTime2Ms += (end - start) / 1000000.0;
                                 }
                                 break;
                             } else {
                                 if (hInput == 1 || hInput == 3) {
+                                    double start = System.nanoTime();
                                     totalSearchCostH1 += aStarMultiple(new Node(board, 0), true);
+                                    double end = System.nanoTime();
+                                    totalTime1Ms += (end - start) / 1000000.0;
                                 }
 
                                 if (hInput == 2 || hInput == 3) {
+                                    double start = System.nanoTime();
                                     totalSearchCostH2 += aStarMultiple(new Node(board, 0), false);
+                                    double end = System.nanoTime();
+                                    totalTime2Ms += (end - start) / 1000000.0;
                                 }
 
                                 board = "";
@@ -200,18 +253,22 @@ public class Puzzle {
                 if (numberOfTests == 1) {
                     if (hInput == 1 || hInput == 3) {
                         System.out.println("Total Search Cost for H1: " + totalSearchCostH1);
+                        System.out.println("Total Search Time for H1: " + totalTime1Ms + "ms");
                     }
 
                     if (hInput == 2 || hInput == 3) {
                         System.out.println("Total Search Cost for H2: " + totalSearchCostH2);
+                        System.out.println("Total Search Time for H2: " + totalTime2Ms + "ms");
                     }
                 } else {
                     if (hInput == 1 || hInput == 3) {
                         System.out.println("Average Search Cost for H1: " + totalSearchCostH1 / tests);
+                        System.out.println("Average Search Time for H1: " + totalTime1Ms / tests + "ms");
                     }
 
                     if (hInput == 2 || hInput == 3) {
                         System.out.println("Average Search Cost for H2: " + totalSearchCostH2 / tests);
+                        System.out.println("Average Search Time for H2: " + totalTime2Ms / tests + "ms");
                     }
                 }
             } else {
@@ -242,6 +299,8 @@ public class Puzzle {
 
                 System.out.println("\nSelect H Function:\n[1] H1\n[2] H2\n[3] Compare H1 and H2");
                 int hInput = scanner.nextInt();
+                double totalTime1Ms = 0;
+                double totalTime2Ms = 0;
 
                 while (true) {
                     if (hInput >= 1 && hInput <= 3) {
@@ -254,16 +313,36 @@ public class Puzzle {
 
                 if (numberOfTests == 1) {
                     if (hInput == 1) {
+                        double start = System.nanoTime();
                         int searchCost = aStarIndividual(initialBoard, true, true);
+                        double end = System.nanoTime();
+                        totalTime1Ms = (end - start) / 1000000.0;
+
                         System.out.println("Search Cost: " + searchCost);
+                        System.out.println("Search Time for H1: " + totalTime1Ms + "ms");
                     } else if (hInput == 2) {
+                        double start = System.nanoTime();
                         int searchCost = aStarIndividual(initialBoard, false, true);
+                        double end = System.nanoTime();
+                        totalTime2Ms = (end - start) / 1000000.0;
+
                         System.out.println("Search Cost: " + searchCost);
+                        System.out.println("Search Time for H2: " + totalTime2Ms + "ms");
                     } else {
+                        double start = System.nanoTime();
                         int searchCostH1 = aStarIndividual(initialBoard, true, false);
+                        double end = System.nanoTime();
+                        totalTime1Ms = (end - start) / 1000000.0;
+
+                        start = System.nanoTime();
                         int searchCostH2 = aStarIndividual(initialBoard, false, true);
+                        end = System.nanoTime();
+                        totalTime2Ms = (end - start) / 1000000.0;
+
                         System.out.println("Search Cost for H1: " + searchCostH1);
+                        System.out.println("Search Time for H1: " + totalTime1Ms + "ms");
                         System.out.println("Search Cost for H2: " + searchCostH2);
+                        System.out.println("Search Time for H2: " + totalTime2Ms + "ms");
                     }
                 } else {
                     int totalSearchCostH1 = 0;
@@ -278,20 +357,28 @@ public class Puzzle {
 
                         String boardString = sb.toString();
                         if (hInput == 1 || hInput == 3) {
+                            double start = System.nanoTime();
                             totalSearchCostH1 += aStarMultiple(new Node (boardString, 0), true);
+                            double end = System.nanoTime();
+                            totalTime1Ms = (end - start) / 1000000.0;
                         } 
                         
                         if (hInput == 2 || hInput == 3) {
+                            double start = System.nanoTime();
                             totalSearchCostH2 += aStarMultiple(new Node (boardString, 0), false);
+                            double end = System.nanoTime();
+                            totalTime2Ms = (end - start) / 1000000.0;
                         } 
                     }
 
                     if (hInput == 1 || hInput == 3) {
                         System.out.println("Average Search Cost for H1: " + ((double) totalSearchCostH1 / numberOfTests));
+                        System.out.println("Average Search Time for H1: " + totalTime1Ms / numberOfTests + "ms");
                     }
 
                     if (hInput == 2 || hInput == 3) {
                         System.out.println("Average Search Cost for H2: " + ((double) totalSearchCostH2 / numberOfTests));
+                        System.out.println("Average Search Time for H2: " + totalTime2Ms / numberOfTests + "ms");
                     }
                 }
             }
