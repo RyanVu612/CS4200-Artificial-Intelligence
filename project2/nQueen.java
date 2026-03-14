@@ -9,11 +9,8 @@ public class nQueen {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter number of queens: ");
         int n = scanner.nextInt();
+        int[][] board = new int[n][n];
         List<int[]> queens = new ArrayList<>();
-
-        for (int i = 0; i < n; i++) {
-            queens.add(new int[n]);
-        }
 
         // Randomize queen positions
         int i = 0;
@@ -21,13 +18,14 @@ public class nQueen {
             int row = (int) (Math.random() * (n));
             int col = (int) (Math.random() * (n));
 
-            if (queens.get(row)[col] == 0) {
-                queens.get(row)[col] = 1;
+            if (board[row][col] == 0) {
+                board[row][col] = 1;
+                queens.add(new int[]{row, col});
                 i++;
             } 
         }  
 
-        printBoard(queens);
+        printBoard(board);
     }
 
     public static boolean checkAttack(){
@@ -35,10 +33,10 @@ public class nQueen {
         return false;
     }
 
-    public static void printBoard(List<int[]> queens) {
-        for (int i = 0; i < queens.size(); i++) {
-            for (int j = 0; j < queens.size(); j++) {
-                System.out.print(queens.get(i)[j] + " ");
+    public static void printBoard(int[][] board) {
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board.length; j++) {
+                System.out.print(board[i][j] + " ");
             }
             System.out.println();
         }
