@@ -26,11 +26,24 @@ public class nQueen {
         }  
 
         printBoard(board);
+        System.out.println("Number of attacks: " + countAttacks(queens));
     }
 
-    public static boolean checkAttack(){
+    public static int countAttacks(List<int[]> queens) {
+        int attacks = 0;
+        for (int i = 0; i < queens.size(); i++) {
+            for (int j = i + 1; j < queens.size(); j++) {
+                int r1 = queens.get(i)[0];
+                int c1 = queens.get(i)[1];
+                int r2 = queens.get(j)[0];
+                int c2 = queens.get(j)[1];
+                if (r1 == r2 || c1 == c2 || Math.abs(r1 - r2) == Math.abs(c1 - c2)) {
+                    attacks++;
+                }
+            }
+        }
 
-        return false;
+        return attacks;
     }
 
     public static void printBoard(int[][] board) {
