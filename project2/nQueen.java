@@ -126,7 +126,6 @@ public class nQueen {
         }
     }
 
-    // return array of [queen index, row, col, attackCount]
     public static List<int[]> steepestAscentStep(List<int[]> queens, int[][] board) {
         List<int[]> next = null;
         int bestAttackCount = countAttacks(queens);
