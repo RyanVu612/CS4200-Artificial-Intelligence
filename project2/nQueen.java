@@ -31,37 +31,98 @@ public class nQueen {
         int[][] board = new int[n][n];
         List<int[]> queens = new ArrayList<>();
 
-        // Randomize queen positions
-        int i = 0;
-        while (i < n){
-            int row = (int) (Math.random() * (n));
-            int col = (int) (Math.random() * (n));
+        System.out.println("Enter number of tests: ");
+        int tests = scanner.nextInt();
 
-            if (board[row][col] == 0) {
-                board[row][col] = 1;
-                queens.add(new int[]{row, col});
-                i++;
-            } 
-        }  
+        System.out.println("Select algorithm:\n[1] Steepest Ascent\n[2] Mutation");
+        int algorithm = scanner.nextInt();
 
-        printBoard(board);
-        System.out.println("Number of attacks: " + countAttacks(queens));
+        if (tests <= 1) {
+            // Randomize queen positions
+            int i = 0;
+            while (i < n){
+                int row = (int) (Math.random() * (n));
+                int col = (int) (Math.random() * (n));
 
-        List<int[]> next = steepestAscentStep(queens, board);
-        while (next != null) {
-            System.out.println("loop");
-            queens = copyList(next);
-            board = generateBoard(queens, n);
-            next = steepestAscentStep(queens, board);
-        }
+                if (board[row][col] == 0) {
+                    board[row][col] = 1;
+                    queens.add(new int[]{row, col});
+                    i++;
+                } 
+            }  
 
-        printBoard(board);
-        if (countAttacks(queens) <= 0) {
-            System.out.println("Board solved");
-            System.out.println("Number of attacks is: " + countAttacks(queens));
+            printBoard(board);
+            System.out.println("Number of attacks: " + countAttacks(queens));
+
+            List<int[]> next = null;
+            if (algorithm == 1) {
+                next = steepestAscentStep(queens, board);
+            } else {
+                // mutation
+            }
+            
+            while (next != null) {
+                System.out.println("loop");
+                queens = copyList(next);
+                board = generateBoard(queens, n);
+                if (algorithm == 1) {
+                    next = steepestAscentStep(queens, board);
+                } else {
+                    // mutation
+                }
+            }
+
+            printBoard(board);
+            if (countAttacks(queens) <= 0) {
+                System.out.println("Board solved");
+                System.out.println("Number of attacks is: " + countAttacks(queens));
+            } else {
+                System.out.println("Board not solved");
+                System.out.println("Number of attacks is: " + countAttacks(queens));
+            }
         } else {
-            System.out.println("Board not solved");
-            System.out.println("Number of attacks is: " + countAttacks(queens));
+            double complete = 0.0;
+
+            for (int i = 0; i < tests; i++) {
+                // Create new board and randomize queens
+                board = new int[n][n];
+                queens = new ArrayList<>();
+                
+                int j = 0;
+                while (j < n){
+                    int row = (int) (Math.random() * (n));
+                    int col = (int) (Math.random() * (n));
+
+                    if (board[row][col] == 0) {
+                        board[row][col] = 1;
+                        queens.add(new int[]{row, col});
+                        j++;
+                    } 
+                }
+
+                List<int[]> next = null;
+                if (algorithm == 1) {
+                    next = steepestAscentStep(queens, board);
+                } else {
+                    // mutation
+                }
+
+                while (next != null) {
+                    queens = copyList(next);
+                    board = generateBoard(queens, n);
+                    if (algorithm == 1) {
+                        next = steepestAscentStep(queens, board);
+                    } else {
+                        // mutation
+                    }
+                }
+
+                if (countAttacks(queens) == 0) {
+                    complete++;
+                }  
+            }
+
+            System.out.println("Percentage of boards completed is: " + (complete / tests) * 100 + "%");
         }
     }
 
@@ -78,8 +139,8 @@ public class nQueen {
             for (Direction d : Direction.values()) {
                 int newRow = originalRow + d.dr;
                 int newCol = orignialCol + d.dc;
-                while (newRow >= 0 && newRow < queens.size() && 
-                       newCol >= 0 && newCol < queens.size() &&
+                while (newRow >= 0 && newRow < board.length && 
+                       newCol >= 0 && newCol < board.length &&
                        board[newRow][newCol] != 1) {
 
                     List<int[]> currentQueensList = copyList(queens);
