@@ -34,6 +34,7 @@ public class nQueen {
             board = generateBoard(queens, n);
 
             System.out.println("Starting board: ");
+            System.out.println("0: ");
             printBoard(board);
             System.out.println("Number of attacks: " + countAttacksTotal(queens));
 
@@ -59,6 +60,7 @@ public class nQueen {
                 steps++;
 
                 System.out.println();
+                System.out.println(i + 1 + ": ");
                 printBoard(board);
                 System.out.println("Number of attacks: " + countAttacksTotal(queens));
 
