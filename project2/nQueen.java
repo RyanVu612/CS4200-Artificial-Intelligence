@@ -190,7 +190,7 @@ public class nQueen {
             }  
         }
 
-        if (!potentialBoards.isEmpty()) {
+        if (potentialBoards.isEmpty()) {
             return null;
         }
 
