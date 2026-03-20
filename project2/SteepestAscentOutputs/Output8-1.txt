@@ -5,6 +5,7 @@ Select algorithm:
 [2] Min-Conflict
 1
 Starting board: 
+0: 
 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 
 1 0 0 0 1 1 0 0 
@@ -15,6 +16,7 @@ Starting board:
 0 0 0 0 0 0 0 0 
 Number of attacks: 10
 
+1: 
 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 
 1 0 0 0 0 1 0 0 
@@ -25,6 +27,7 @@ Number of attacks: 10
 0 0 0 0 1 0 0 0 
 Number of attacks: 6
 
+2: 
 0 1 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 
 1 0 0 0 0 1 0 0 
@@ -35,6 +38,7 @@ Number of attacks: 6
 0 0 0 0 1 0 0 0 
 Number of attacks: 3
 
+3: 
 0 1 0 0 0 1 0 0 
 0 0 0 0 0 0 0 0 
 1 0 0 0 0 0 0 0 
@@ -45,6 +49,7 @@ Number of attacks: 3
 0 0 0 0 1 0 0 0 
 Number of attacks: 2
 
+4: 
 0 1 0 0 0 1 0 0 
 0 0 0 0 0 0 0 0 
 1 0 0 0 0 0 0 0 
@@ -55,6 +60,7 @@ Number of attacks: 2
 0 0 0 0 1 0 0 0 
 Number of attacks: 1
 
+5: 
 0 1 0 0 0 0 0 0 
 0 0 0 0 0 1 0 0 
 1 0 0 0 0 0 0 0 

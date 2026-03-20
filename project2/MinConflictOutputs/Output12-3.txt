@@ -6,6 +6,7 @@ Select algorithm:
 2
 Enter max-steps: 600
 Starting board: 
+0: 
 0 0 1 0 0 0 0 0 1 0 0 1 
 0 0 0 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -20,6 +21,7 @@ Starting board:
 0 1 0 1 0 0 0 0 0 0 1 0 
 Number of attacks: 12
 
+1: 
 0 0 1 0 0 0 0 0 0 0 0 1 
 0 0 0 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -34,6 +36,7 @@ Number of attacks: 12
 0 1 0 1 0 0 0 0 0 0 1 0 
 Number of attacks: 9
 
+2: 
 0 0 1 0 0 0 0 0 0 0 0 1 
 0 0 0 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -48,6 +51,7 @@ Number of attacks: 9
 0 1 0 1 0 0 0 0 0 0 1 0 
 Number of attacks: 9
 
+3: 
 0 0 1 0 0 0 0 0 0 0 0 1 
 0 0 0 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -62,6 +66,7 @@ Number of attacks: 9
 0 1 0 1 0 0 0 0 0 0 1 0 
 Number of attacks: 8
 
+4: 
 0 0 1 0 0 0 0 0 0 0 0 1 
 0 0 0 0 1 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -76,6 +81,7 @@ Number of attacks: 8
 0 1 0 1 0 0 0 0 0 0 1 0 
 Number of attacks: 5
 
+5: 
 0 0 1 0 0 0 0 0 0 0 0 1 
 0 0 0 0 1 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -90,6 +96,7 @@ Number of attacks: 5
 0 0 0 1 0 0 0 0 0 0 1 0 
 Number of attacks: 3
 
+6: 
 0 0 1 0 0 0 0 0 0 0 0 1 
 0 0 0 0 1 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 0 0 0 0 
@@ -104,6 +111,7 @@ Number of attacks: 3
 0 0 0 1 0 0 0 0 0 0 1 0 
 Number of attacks: 3
 
+7: 
 0 0 0 0 0 0 0 0 0 0 0 1 
 0 0 0 0 1 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 0 0 0 0 
@@ -118,6 +126,7 @@ Number of attacks: 3
 0 0 0 1 0 0 0 0 0 0 1 0 
 Number of attacks: 3
 
+8: 
 0 0 0 0 0 0 0 0 0 0 0 1 
 0 0 0 0 1 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 0 0 0 0 
@@ -132,6 +141,7 @@ Number of attacks: 3
 0 0 0 1 0 0 0 0 0 0 0 0 
 Number of attacks: 3
 
+9: 
 0 0 0 0 0 0 0 0 0 0 0 1 
 0 0 1 0 1 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 0 0 0 0 
@@ -146,6 +156,7 @@ Number of attacks: 3
 0 0 0 1 0 0 0 0 0 0 0 0 
 Number of attacks: 3
 
+10: 
 0 0 1 0 0 0 0 0 0 0 0 1 
 0 0 0 0 1 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 0 0 0 0 
@@ -160,6 +171,7 @@ Number of attacks: 3
 0 0 0 1 0 0 0 0 0 0 0 0 
 Number of attacks: 3
 
+11: 
 0 0 0 0 0 0 0 0 0 0 0 1 
 0 0 1 0 1 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 0 0 0 0 
@@ -174,6 +186,7 @@ Number of attacks: 3
 0 0 0 1 0 0 0 0 0 0 0 0 
 Number of attacks: 3
 
+12: 
 0 0 0 0 0 0 0 0 0 0 0 1 
 0 0 1 0 1 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -188,6 +201,7 @@ Number of attacks: 3
 0 0 0 1 0 0 0 0 0 0 0 0 
 Number of attacks: 3
 
+13: 
 0 0 0 0 0 0 0 0 0 0 0 1 
 0 0 1 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -202,6 +216,7 @@ Number of attacks: 3
 0 0 0 1 0 0 0 0 0 0 0 0 
 Number of attacks: 2
 
+14: 
 0 0 0 0 0 0 0 1 0 0 0 1 
 0 0 1 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -216,6 +231,7 @@ Number of attacks: 2
 0 0 0 1 0 0 0 0 0 0 0 0 
 Number of attacks: 1
 
+15: 
 0 0 0 0 0 0 0 1 0 0 0 0 
 0 0 1 0 0 0 0 0 0 0 0 1 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -230,6 +246,7 @@ Number of attacks: 1
 0 0 0 1 0 0 0 0 0 0 0 0 
 Number of attacks: 1
 
+16: 
 0 0 0 0 0 0 0 1 0 0 0 0 
 0 0 1 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -244,6 +261,7 @@ Number of attacks: 1
 0 0 0 1 0 0 0 0 0 0 0 0 
 Number of attacks: 1
 
+17: 
 0 0 0 0 0 0 0 1 0 0 0 0 
 0 0 1 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -258,6 +276,7 @@ Number of attacks: 1
 0 0 0 0 0 0 0 0 0 0 0 0 
 Number of attacks: 1
 
+18: 
 0 0 0 0 0 0 0 1 0 0 0 0 
 0 0 1 1 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -272,6 +291,7 @@ Number of attacks: 1
 0 0 0 0 0 0 0 0 0 0 0 0 
 Number of attacks: 1
 
+19: 
 0 0 0 0 0 0 0 1 0 0 0 0 
 0 0 1 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -286,6 +306,7 @@ Number of attacks: 1
 0 0 0 1 0 0 0 0 0 0 0 0 
 Number of attacks: 1
 
+20: 
 0 0 0 0 0 0 0 1 0 0 0 1 
 0 0 1 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -300,6 +321,7 @@ Number of attacks: 1
 0 0 0 1 0 0 0 0 0 0 0 0 
 Number of attacks: 1
 
+21: 
 0 0 0 0 0 0 0 1 0 0 0 0 
 0 0 1 0 0 0 0 0 0 0 0 1 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -314,6 +336,7 @@ Number of attacks: 1
 0 0 0 1 0 0 0 0 0 0 0 0 
 Number of attacks: 1
 
+22: 
 0 0 0 0 0 0 0 1 0 0 0 0 
 0 0 1 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -328,6 +351,7 @@ Number of attacks: 1
 0 0 0 1 0 0 0 0 0 0 0 0 
 Number of attacks: 1
 
+23: 
 0 0 0 0 0 0 0 1 0 0 0 0 
 0 0 1 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
@@ -342,6 +366,7 @@ Number of attacks: 1
 0 0 0 0 0 0 0 0 0 0 0 0 
 Number of attacks: 1
 
+24: 
 0 0 0 0 0 0 0 1 0 0 0 0 
 0 0 1 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 1 0 0 0 0 0 
