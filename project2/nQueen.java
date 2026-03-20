@@ -1,29 +1,10 @@
 package project2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
 public class nQueen {
-    // Directional Enum
-    enum Direction {
-        UP(-1, 0),
-        DOWN(1, 0),
-        LEFT(0, -1),
-        RIGHT(0, 1),
-        UPLEFT(-1,-1),
-        UPRIGHT(-1, 1),
-        DOWNLEFT(1, -1),
-        DOWNRIGHT(1, 1);
-
-        int dr, dc;
-
-        Direction(int dr, int dc) {
-            this.dr = dr;
-            this.dc = dc;
-        }
-    }
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter number of queens: ");
@@ -44,6 +25,8 @@ public class nQueen {
             System.out.print("Enter max-steps: ");
             max_steps = scanner.nextInt();
         }
+
+        scanner.close();
 
         if (tests <= 1) {
             // Randomize queen positions
