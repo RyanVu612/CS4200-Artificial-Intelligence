@@ -1,0 +1,58 @@
+Enter number of queens: 8
+Enter number of tests: 1
+Select algorithm:
+[1] Steepest Ascent
+[2] Min-Conflict
+1
+Starting board: 
+0 0 0 1 1 0 0 0 
+0 0 0 0 0 0 1 0 
+0 0 0 0 0 1 0 0 
+0 1 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 
+0 0 1 0 0 0 0 0 
+1 0 0 0 0 0 0 1 
+Number of attacks: 7
+
+0 0 0 1 1 0 0 0 
+0 0 0 0 0 0 1 0 
+0 0 0 0 0 1 0 0 
+0 1 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 
+1 0 0 0 0 0 0 0 
+0 0 1 0 0 0 0 0 
+0 0 0 0 0 0 0 1 
+Number of attacks: 4
+
+0 0 0 1 1 0 0 0 
+0 0 0 0 0 0 1 0 
+0 0 0 0 0 0 0 0 
+0 1 0 0 0 0 0 0 
+0 0 0 0 0 1 0 0 
+1 0 0 0 0 0 0 0 
+0 0 1 0 0 0 0 0 
+0 0 0 0 0 0 0 1 
+Number of attacks: 2
+
+0 0 0 1 0 0 0 0 
+0 0 0 0 0 0 1 0 
+0 0 0 0 1 0 0 0 
+0 1 0 0 0 0 0 0 
+0 0 0 0 0 1 0 0 
+1 0 0 0 0 0 0 0 
+0 0 1 0 0 0 0 0 
+0 0 0 0 0 0 0 1 
+Number of attacks: 0
+========================
+0 0 0 1 0 0 0 0 
+0 0 0 0 0 0 1 0 
+0 0 0 0 1 0 0 0 
+0 1 0 0 0 0 0 0 
+0 0 0 0 0 1 0 0 
+1 0 0 0 0 0 0 0 
+0 0 1 0 0 0 0 0 
+0 0 0 0 0 0 0 1 
+Board solved
+Number of attacks is: 0
+Total Steps is: 3
