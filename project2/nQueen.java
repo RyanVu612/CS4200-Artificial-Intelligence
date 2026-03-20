@@ -133,8 +133,8 @@ public class nQueen {
 
             System.out.println("Percentage of boards completed is: " + ((double)complete / tests) * 100 + "%");
             System.out.println("Average number of steps is: " + ((double)steps / complete));
-            System.out.println("Runtime (ns): " + totalRuntimeMs);
-            System.out.println("Average runtime (ns): " + (totalRuntimeMs / (double) tests) + "ms");
+            System.out.println("Runtime (ms): " + totalRuntimeMs);
+            System.out.println("Average runtime (ms): " + (totalRuntimeMs / (double) tests) + "ms");
         }
     }
 
