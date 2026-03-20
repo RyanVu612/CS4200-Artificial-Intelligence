@@ -37,6 +37,7 @@ public class nQueen {
             printBoard(board);
             System.out.println("Number of attacks: " + countAttacksTotal(queens));
 
+            double startNs = System.nanoTime();
             List<int[]> next = null;
             if (algorithm == 1) {
                 next = steepestAscentStep(queens, board);
@@ -66,6 +67,8 @@ public class nQueen {
                     i++;
                 }
             }
+            double endNs = System.nanoTime();
+            double runtimeMs = (endNs - startNs) / 1000000.0;
 
             System.out.println("========================");
             printBoard(board);
@@ -82,14 +85,18 @@ public class nQueen {
 
             System.out.println("Number of attacks is: " + countAttacksTotal(queens));
             System.out.println("Total Steps is: " + steps);
+            System.out.println("Runtime (ms): " + runtimeMs);
         } else {
             int complete = 0;
+            double totalRuntimeMs = 0;
 
             for (int i = 0; i < tests; i++) {
+                int counter = 0;
                 // Create new board and randomize queens
                 queens = randomQueens(n); 
                 board = generateBoard(queens, n);
 
+                double startNs = System.nanoTime();
                 List<int[]> next = null;
                 if (algorithm == 1) {
                     next = steepestAscentStep(queens, board);
@@ -107,21 +114,25 @@ public class nQueen {
                         next = minConflictsStep(queens, board);
                     }
 
-                    steps++;
+                    counter++;
 
                     if (algorithm == 2) {
                         if (j > max_steps) break;
                         j++;
                     }
                 }
+                totalRuntimeMs += (System.nanoTime() - startNs) / 1000000.0;
 
                 if (countAttacksTotal(queens) == 0) {
                     complete++;
+                    steps += counter;
                 }  
             }
 
             System.out.println("Percentage of boards completed is: " + ((double)complete / tests) * 100 + "%");
-            System.out.println("Average number of steps is: " + ((double)steps / tests));
+            System.out.println("Average number of steps is: " + ((double)steps / complete));
+            System.out.println("Runtime (ns): " + totalRuntimeMs);
+            System.out.println("Average runtime (ns): " + (totalRuntimeMs / (double) tests) + "ms");
         }
     }
 
