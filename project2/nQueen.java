@@ -31,11 +31,19 @@ public class nQueen {
         int[][] board = new int[n][n];
         List<int[]> queens = new ArrayList<>();
 
-        System.out.println("Enter number of tests: ");
+        int steps = 0;
+
+        System.out.print("Enter number of tests: ");
         int tests = scanner.nextInt();
 
-        System.out.println("Select algorithm:\n[1] Steepest Ascent\n[2] Mutation");
+        System.out.println("Select algorithm:\n[1] Steepest Ascent\n[2] Min-Conflict");
         int algorithm = scanner.nextInt();
+
+        int max_steps = 0;
+        if (algorithm == 2) {
+            System.out.print("Enter max-steps: ");
+            max_steps = scanner.nextInt();
+        }
 
         if (tests <= 1) {
             // Randomize queen positions
@@ -50,31 +58,47 @@ public class nQueen {
             if (algorithm == 1) {
                 next = steepestAscentStep(queens, board);
             } else {
-                // min-conflicts
+                next = minConflictsStep(queens, board);
             }
             
-            if (algorithm == 1) {
-                while (next != null) {
-                    queens = copyList(next);
-                    board = generateBoard(queens, n);
+            int i = 0;
+            while (next != null) {
+                queens = copyList(next);
+                board = generateBoard(queens, n);
+
+                if (algorithm == 1) {
                     next = steepestAscentStep(queens, board);
-
-                    System.out.println();
-                    printBoard(board);
-                    System.out.println("Number of attacks: " + countAttacksTotal(queens));
+                } else {
+                    next = minConflictsStep(queens, board);
                 }
-            } else {
 
+                steps++;
+
+                System.out.println();
+                printBoard(board);
+                System.out.println("Number of attacks: " + countAttacksTotal(queens));
+
+                if (algorithm == 2) {
+                    if (i > max_steps) break;
+                    i++;
+                }
             }
 
+            System.out.println("========================");
             printBoard(board);
+
+            if (algorithm == 2 && i > max_steps) {
+                System.out.println("Max Steps reached");
+            }
+
             if (countAttacksTotal(queens) <= 0) {
                 System.out.println("Board solved");
-                System.out.println("Number of attacks is: " + countAttacksTotal(queens));
             } else {
                 System.out.println("Board not solved");
-                System.out.println("Number of attacks is: " + countAttacksTotal(queens));
             }
+
+            System.out.println("Number of attacks is: " + countAttacksTotal(queens));
+            System.out.println("Total Steps is: " + steps);
         } else {
             double complete = 0.0;
 
@@ -87,16 +111,24 @@ public class nQueen {
                 if (algorithm == 1) {
                     next = steepestAscentStep(queens, board);
                 } else {
-                    // min-conflicts
+                    next = minConflictsStep(queens, board);
                 }
 
+                int j = 0;
                 while (next != null) {
                     queens = copyList(next);
                     board = generateBoard(queens, n);
                     if (algorithm == 1) {
                         next = steepestAscentStep(queens, board);
                     } else {
-                        //min-conflicts
+                        next = minConflictsStep(queens, board);
+                    }
+
+                    steps++;
+
+                    if (algorithm == 2) {
+                        if (j > max_steps) break;
+                        j++;
                     }
                 }
 
@@ -106,6 +138,7 @@ public class nQueen {
             }
 
             System.out.println("Percentage of boards completed is: " + (complete / tests) * 100 + "%");
+            System.out.println("Average number of steps is: " + (steps / tests));
         }
     }
 
@@ -144,64 +177,59 @@ public class nQueen {
         return next;
     }
 
-    public static List<int[]> minConflictsStep(int n, int maxSteps) {
+    public static List<int[]> minConflictsStep(List<int[]> queens, int[][] board) {
         // csp: {queens, board, attacks}
-        List<int[]> queens = randomQueens(n);
-        int[][] board = generateBoard(queens, n);
-
+        List<int[]> next = null;
         List<List<int[]>> potentialBoards = new ArrayList<>();
 
-        for (int i = 0; i < maxSteps; i++) {
-            if (countAttacksTotal(queens) == 0) {
-                return queens;
-            }
-
-            int index = 0;
-            int attacks = 0;
-            while (attacks == 0) {
-                // pick a random queen
-                index = (int) (Math.random() * n);
-                attacks = countAttacksIndividual(queens, index);
-            }
-
-            int[] queen = queens.get(index);
-            int originalRow = queen[0];
-            int orignialCol = queen[1];
-
-            // find conflicts and hold onto lowest ones
-            for (Direction d : Direction.values()) {
-                int newRow = originalRow + d.dr;
-                int newCol = orignialCol + d.dc;
-                while (newRow >= 0 && newRow < board.length && 
-                       newCol >= 0 && newCol < board.length &&
-                       board[newRow][newCol] != 1) {
-
-                    List<int[]> currentQueensList = copyList(queens);
-                    currentQueensList.set(index, new int[]{newRow, newCol});
-
-                    int currentAttackCount = countAttacksIndividual(currentQueensList, index);
-
-                    if (currentAttackCount < attacks) {
-                        potentialBoards.clear();
-                        attacks = currentAttackCount;
-                        potentialBoards.add(copyList(currentQueensList));
-                    } else if (currentAttackCount == attacks) {
-                        potentialBoards.add(copyList(currentQueensList));
-                    }
-
-                    newRow += d.dr;
-                    newCol += d.dc;
-                }    
-            }
-
-            if (!potentialBoards.isEmpty()) {
-                int tempIndex = (int) (Math.random() * potentialBoards.size());
-                queens = copyList(potentialBoards.get(tempIndex));
-                potentialBoards.clear();
-            }
+        if (countAttacksTotal(queens) == 0) {
+            return next;
         }
-        // return failure board
-        return queens;
+
+        int index = 0;
+        int attacks = 0;
+        while (attacks == 0) {
+            // pick a random queen
+            index = (int) (Math.random() * queens.size());
+            attacks = countAttacksIndividual(queens, index);
+        }
+
+        int[] queen = queens.get(index);
+        int originalRow = queen[0];
+        int orignialCol = queen[1];
+
+        // find conflicts and hold onto lowest ones
+        for (Direction d : Direction.values()) {
+            int newRow = originalRow + d.dr;
+            int newCol = orignialCol + d.dc;
+            while (newRow >= 0 && newRow < board.length && 
+                    newCol >= 0 && newCol < board.length &&
+                    board[newRow][newCol] != 1) {
+
+                List<int[]> currentQueensList = copyList(queens);
+                currentQueensList.set(index, new int[]{newRow, newCol});
+
+                int currentAttackCount = countAttacksIndividual(currentQueensList, index);
+
+                if (currentAttackCount < attacks) {
+                    potentialBoards.clear();
+                    attacks = currentAttackCount;
+                    potentialBoards.add(copyList(currentQueensList));
+                } else if (currentAttackCount == attacks) {
+                    potentialBoards.add(copyList(currentQueensList));
+                }
+
+                newRow += d.dr;
+                newCol += d.dc;
+            }    
+        }
+
+        if (!potentialBoards.isEmpty()) {
+            int tempIndex = (int) (Math.random() * potentialBoards.size());
+            next = copyList(potentialBoards.get(tempIndex));
+        }
+
+        return next;
     }
 
     public static List<int[]> copyList(List<int[]> list) {
