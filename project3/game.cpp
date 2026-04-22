@@ -17,12 +17,13 @@ char b[9][9], maxdepth = 5;
 int main ()
 { setup();
   printboard();
-  // for (;;)
-  // {  getamove();
+  for (;;)
+  { getamove();
+    printboard();
   //    checkGameOver();
   //    makemove();
   //    checkGameOver();
-} //}
+} }
 
 void printboard()
 { cout << endl;
@@ -59,10 +60,30 @@ void setup()
 
 void getamove()
 { char i; int j;
-  cout << "Enter your move:  ";
-  cin >> i >> j;
-  int temp = i - 'A' + 1;
-  b[i][j]='X';
+  do {
+    cout << "Enter row: ";
+    cin >> i;
+    while (i < 'A' || i > 'H'){
+      cout << "Enter a valid row: ";
+      cin >> i;
+    }
+
+    cout << "Enter column: ";
+    cin >> j;
+    while (j < 1 || j > 8){
+      cout << "Enter a valid column: ";
+      cin >> j;
+    }
+
+    if (b[i - 'A' + 1][j] != '-') {
+      cout << "This space is already taken." << endl;
+      i = ' ';
+      j = 0;
+      continue;
+    } else {
+      b[i - 'A' + 1][j] = 'X';
+    }
+  } while (b[i - 'A' + 1][j] == '-');
 }
 
 int evaluate ()
