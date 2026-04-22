@@ -2,27 +2,28 @@
 #include <iostream>
 using namespace std;
 
-void makemove();
 int min(int depth);
 int max(int depth);
 int evaluate();
-int check4winner();
-void checkGameOver();
-void getamove();
+int check4winner(int i, int j, char move);
+void checkGameOver(int i, int j, char move);
+void getamove(int &row, int &col);
+void makemove(int &row, int &col);
 void setup();
 void printboard();
 
-char b[9][9], maxdepth = 5;
+char b[9][9], maxdepth = 2;
 
 int main ()
-{ setup();
+{ int r; int c;
+  setup();
   printboard();
   for (;;)
-  { getamove();
-    printboard();
-  //    checkGameOver();
-  //    makemove();
-  //    checkGameOver();
+  { getamove(r, c);
+    checkGameOver(r, c, 'X');
+
+    makemove(r, c);
+    checkGameOver(r, c, 'O');
 } }
 
 void printboard()
@@ -58,9 +59,9 @@ void setup()
   }
 }
 
-void getamove()
+void getamove(int &row, int &col)
 { char i; int j;
-  do {
+  while (true) {
     cout << "Enter row: ";
     cin >> i;
     while (i < 'A' || i > 'H'){
@@ -75,90 +76,127 @@ void getamove()
       cin >> j;
     }
 
-    if (b[i - 'A' + 1][j] != '-') {
+    row = i - 'A' + 1;
+    col = j;
+
+    if (b[row][col] != '-') {
       cout << "This space is already taken." << endl;
       i = ' ';
       j = 0;
       continue;
     } else {
-      b[i - 'A' + 1][j] = 'X';
+      b[row][col] = 'X';
+      break;
     }
-  } while (b[i - 'A' + 1][j] == '-');
+  }
 }
 
 int evaluate ()
 { return 0; }
 
-
-void makemove()
+void makemove(int &row, int &col)
 { int best=-20000,depth=maxdepth,score,mi,mj;
-  for (int i=0; i<3; i++)
-  { for (int j=0; j<3; j++)
-    { if (b[i][j]==0)
-      { b[i][j]=1; // make move on board
+  for (int i=0; i<9; i++)
+  { for (int j=0; j<9; j++)
+    { if (b[i][j]== '-')
+      { b[i][j]='O'; // make move on board
         score = min(depth-1);
         if (score > best) { mi=i; mj=j; best=score; }
-        b[i][j]=0; // undo move
+        b[i][j]='-'; // undo move
   } } }
   cout << "my move is " << mi << " " << mj << endl;
-  b[mi][mj]=1;
+  b[mi][mj]='O';
+  row = mi;
+  col = mj;
 }
-int min(int depth)
+
+int min(int depth) // player turn
 { int best=20000,score;
-  if (check4winner() != 0) return (check4winner());
   if (depth == 0) return (evaluate());
-  for (int i=0; i<3; i++)
-  { for (int j=0; j<3; j++)
-    { if (b[i][j]==0)
-      { b[i][j]=2; // make move on board
+  for (int i=0; i<9; i++)
+  { for (int j=0; j<9; j++)
+    { if (b[i][j]=='-')
+      { b[i][j]='X'; // make move on board
+        if (check4winner(i, j, 'X') != 0){
+          b[i][j]='-'; //undo move
+          return check4winner(i, j, 'X');
+        } 
         score = max(depth-1);
         if (score < best) best=score;
-        b[i][j]=0; // undo move
+        b[i][j]='-'; // undo move
   } } }
   return(best);
 }
 
-int max(int depth)
+int max(int depth) // computer turn
 { int best=-20000,score;
-  if (check4winner() != 0) return (check4winner());
   if (depth == 0) return (evaluate());
-  for (int i=0; i<3; i++)
-  { for (int j=0; j<3; j++)
-    { if (b[i][j]==0)
-      { b[i][j]=1; // make move on board
+  for (int i=0; i<9; i++)
+  { for (int j=0; j<9; j++)
+    { if (b[i][j]=='-')
+      { b[i][j]='O'; // make move on board
+        if (check4winner(i, j, 'O') != 0) {
+          b[i][j]='-';  // undo move
+          return check4winner(i, j, 'O');
+        }
         score = min(depth-1);
         if (score > best) best=score;
-        b[i][j]=0; // undo move
+        b[i][j]='-'; // undo move
   } } }
   return(best);
 }
 
-int check4winner()
-{ if ((b[0][0]==1)&&(b[0][1]==1)&&(b[0][2]==1)
-   || (b[1][0]==1)&&(b[1][1]==1)&&(b[1][2]==1)
-   || (b[2][0]==1)&&(b[2][1]==1)&&(b[2][2]==1)
-   || (b[0][0]==1)&&(b[1][0]==1)&&(b[2][0]==1)
-   || (b[0][1]==1)&&(b[1][1]==1)&&(b[2][1]==1)
-   || (b[0][2]==1)&&(b[1][2]==1)&&(b[2][2]==1)
-   || (b[0][0]==1)&&(b[1][1]==1)&&(b[2][2]==1)
-   || (b[0][2]==1)&&(b[1][1]==1)&&(b[2][0]==1)) return 5000;  // computer wins
-  if ((b[0][0]==2)&&(b[0][1]==2)&&(b[0][2]==2)
-   || (b[1][0]==2)&&(b[1][1]==2)&&(b[1][2]==2)
-   || (b[2][0]==2)&&(b[2][1]==2)&&(b[2][2]==2)
-   || (b[0][0]==2)&&(b[1][0]==2)&&(b[2][0]==2)
-   || (b[0][1]==2)&&(b[1][1]==2)&&(b[2][1]==2)
-   || (b[0][2]==2)&&(b[1][2]==2)&&(b[2][2]==2)
-   || (b[0][0]==2)&&(b[1][1]==2)&&(b[2][2]==2)
-   || (b[0][2]==2)&&(b[1][1]==2)&&(b[2][0]==2)) return -5000;
-for (int i=0; i<3; i++)
-  for (int j=0; j<3; j++)
-    {if (b[i][j]==0) return 0;}
+int check4winner(int i, int j, char move) // i and j represent last move made; return 5000 for computer win, -5000 for player
+{ int temp; int count;
+
+// check horizontal win condition
+count = 1;
+temp = j - 1;
+while (b[i][temp] == move) {
+  count++;
+  temp--;
+}
+
+temp = j + 1;
+while (b[i][temp] == move) {
+  count++;
+  temp++;
+}
+
+if (count == 4) {
+  if (move == 'X') return -5000;
+  if (move == 'O') return 5000;
+}
+
+// check vertical win conditions
+count = 1;
+temp = i - 1;
+while (b[temp][j] == move) {
+  count++;
+  temp--;
+}
+
+temp = i + 1;
+while (b[temp][j] == move) {
+  count++;
+  temp++;
+}
+
+if (count == 4) {
+  if (move == 'X') return -5000;
+  if (move == 'O') return 5000;
+}
+
+for (int i=1; i<=8; i++)
+  for (int j=1; j<=8; j++)
+    {if (b[i][j]=='-') return 0;}
   return 1; // draw
 }
 
-void checkGameOver()
+void checkGameOver(int i, int j, char move)
 { printboard();
-  if (check4winner() == -5000) { cout << "you win" << endl; exit(0); }
-  if (check4winner() == 5000)  { cout << "I win"   << endl; exit(0); }
-  if (check4winner() == 1)     { cout << "draw"    << endl; exit(0); }
+  int result = check4winner(i, j, move);
+  if (result == -5000) { cout << "you win" << endl; exit(0); }
+  if (result == 5000)  { cout << "I win"   << endl; exit(0); }
+  if (result == 1)     { cout << "draw"    << endl; exit(0); }
 }
