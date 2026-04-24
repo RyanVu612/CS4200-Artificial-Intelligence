@@ -6,13 +6,14 @@ int min(int depth, int alpha, int beta);
 int max(int depth, int alpha, int beta);
 int evaluate();
 int check4winner(int i, int j, char move);
+int distToCenter(int row, int col);
 void checkGameOver(int i, int j, char move);
 void getamove(int &row, int &col);
 void makemove(int &row, int &col);
 void setup();
 void printboard();
 
-char b[9][9], maxdepth = 2;
+char b[9][9], maxdepth = 4;
 
 int main ()
 { int r; int c;
@@ -91,19 +92,151 @@ void getamove(int &row, int &col)
   }
 }
 
+
+// Ways to gain points: 
+// positive = computer (O)
+// negative = player (X)
+// 1: be one move away from winning
+// 2: opponent one move away from winning
+// 3: have 2 in a row with 2 open sides
+// 4: opponent has 2 in a row with 2 open sides
+// 5: make a move next to already placed with the ability to create 4 in a row (either 3 - to either side, 2 - on one side + 1 - on other side)
+// 6: 
+// 7: if move first, always pic k one of the middle tiles
+// 8: block against outside priority. 
+
+// Note: is only one way. Can prioritize a certain O/X
 int evaluate ()
-{ int count = 0;
-  return count;
+{ int score=0;
+  
+  // win already considered through check4win()
+
+  for (int i = 1; i <= 8; i++) {
+    int count1=0;
+    char move1='-';
+    int count2=0;
+    char move2='-';
+    for (int j = 1; j <= 8; j++) {
+      // horizontal
+      if (b[i][j] == '-') {
+        if (count1 == 2) {  // 2 in a row
+          if (move1 == 'X') score -= 400;
+          if (move1 == 'O') score += 300;
+        }
+        count1 = 0;
+        move1 = '-';
+      } else if (b[i][j] == 'X') {
+        if (move1 == 'X') {
+          count1++;
+        } else {
+          if (count1 == 2) score += 300;
+          move1 = 'X';
+          count1 = 1;
+        }
+      } else {
+        if (move1 == 'O') {
+          count1++;
+        } else {
+          if (count1 == 2) score -= 400;
+          move1 = 'O';
+          count1 = 1;
+        }
+      }
+      if (count1 == 3) {
+        if (move1 == 'X') score -= 1200;
+        if (move1 == 'O') score += 1000;
+      }
+
+      // vertical
+      if (b[j][i] == '-') {
+        if (count2 == 2) {  // 2 in a row
+          if (move2 == 'X') score -= 400;
+          if (move2 == 'O') score += 300;
+        }
+        count2 = 0;
+        move2 = '-';
+      } else if (b[j][i] == 'X') {
+        if (move2 == 'X') {
+          count2++;
+        } else {
+          if (count2 == 2) score += 300;
+          move2 = 'X';
+          count2 = 1;
+        }
+      } else {
+        if (move2 == 'O') {
+          count2++;
+        } else {
+          if (count2 == 2) score -= 400;
+          move2 = 'O';
+          count2 = 1;
+        }
+      }
+      if (count2 == 3) {
+        if (move2 == 'X') score -= 2500;
+        if (move2 == 'O') score += 2000;
+      }
+
+      // reward for being around other already placed tiles
+      if (b[i][j] == 'O') {
+        for (int dRow = -1; dRow <= 1; dRow++) {
+          for (int dCol = -1; dCol <= 1; dCol++) {
+            if (dRow == 0 && dCol == 0) continue;
+      
+            int ni = i + dRow;
+            int nj = j + dCol;
+      
+            if (ni < 1 || ni > 8 || nj < 1 || nj > 8) continue;
+      
+            if (b[ni][nj] == 'X') score += 20;
+            if (b[ni][nj] == 'O') score += 10;
+          }
+        }
+      } else if (b[i][j] == 'X') {
+        for (int dRow = -1; dRow <= 1; dRow++) {
+          for (int dCol = -1; dCol <= 1; dCol++) {
+            if (dRow == 0 && dCol == 0) continue;
+      
+            int ni = i + dRow;
+            int nj = j + dCol;
+      
+            if (ni < 1 || ni > 8 || nj < 1 || nj > 8) continue;
+      
+            if (b[ni][nj] == 'O') score -= 20;
+            if (b[ni][nj] == 'X') score -= 10;
+          }
+        }
+      }
+
+      // reward being towards middle
+      if (b[i][j] == 'O') {
+        score += 8 - distToCenter(i, j);
+      } else if (b[i][j] == 'X') {
+        score -= 8 - distToCenter(i, j);
+      }
+    }
+  }
+
+  return score;
 }
 
 void makemove(int &row, int &col)
-{ int best=-20000,depth=maxdepth,score,mi,mj,alpha=0,beta=0;
-  for (int i=0; i<9; i++)
-  { for (int j=0; j<9; j++)
+{ int best=-20000,depth=maxdepth,score,mi=1,mj=1,alpha=-999999,beta=999999;
+  for (int i=1; i<=8; i++)
+  { for (int j=1; j<=8; j++)
     { if (b[i][j]== '-')
-      { b[i][j]='O'; // make move on board
-        score = min(depth-1, alpha, beta);
-        if (score > best) { mi=i; mj=j; best=score; }
+      { b[i][j] = 'O';
+        int result = check4winner(i, j, 'O');
+        if (result != 0) {
+          score = result;
+        } else {
+          score = min(depth - 1, alpha, beta);
+        }
+        if (score > best || (score == best && distToCenter(i, j) < distToCenter(mi, mj))) {
+          mi = i;
+          mj = j;
+          best = score;
+        }
         b[i][j]='-'; // undo move
   } } }
   cout << "my move is " << mi << " " << mj << endl;
@@ -158,48 +291,55 @@ int max(int depth, int alpha, int beta) // computer turn
 int check4winner(int i, int j, char move) // i and j represent last move made; return 5000 for computer win, -5000 for player
 { int temp; int count;
 
-// check horizontal win condition
-count = 1;
-temp = j - 1;
-while (b[i][temp] == move && temp > 0 && temp < 9) {
-  count++;
-  temp--;
-}
+  // check horizontal win condition
+  count = 1;
+  temp = j - 1;
+  while (temp > 0 && temp < 9 && b[i][temp] == move) {
+    count++;
+    temp--;
+  }
 
-temp = j + 1;
-while (b[i][temp] == move && temp > 0 && temp < 9) {
-  count++;
-  temp++;
-}
+  temp = j + 1;
+  while (temp > 0 && temp < 9 && b[i][temp] == move) {
+    count++;
+    temp++;
+  }
 
-if (count == 4) {
-  if (move == 'X') return -5000;
-  if (move == 'O') return 5000;
-}
+  if (count == 4) {
+    if (move == 'X') return -5000;
+    if (move == 'O') return 5000;
+  }
 
-// check vertical win conditions
-count = 1;
-temp = i - 1;
-while (b[temp][j] == move && temp > 0 && temp < 9) {
-  count++;
-  temp--;
-}
+  // check vertical win conditions
+  count = 1;
+  temp = i - 1;
+  while (temp > 0 && temp < 9 && b[temp][j] == move) {
+    count++;
+    temp--;
+  }
 
-temp = i + 1;
-while (b[temp][j] == move && temp > 0 && temp < 9) {
-  count++;
-  temp++;
-}
+  temp = i + 1;
+  while (temp > 0 && temp < 9 && b[temp][j] == move) {
+    count++;
+    temp++;
+  }
 
-if (count == 4) {
-  if (move == 'X') return -5000;
-  if (move == 'O') return 5000;
-}
+  if (count == 4) {
+    if (move == 'X') return -5000;
+    if (move == 'O') return 5000;
+  }
 
-for (int i=1; i<=8; i++)
-  for (int j=1; j<=8; j++)
-    {if (b[i][j]=='-') return 0;}
+  for (int i=1; i<=8; i++)
+    for (int j=1; j<=8; j++)
+      {if (b[i][j]=='-') return 0;}
   return 1; // draw
+}
+
+int distToCenter(int row, int col)
+{
+  int drow = min(abs(row - 4), abs(row - 5));
+  int dcol = min(abs(col - 4), abs(col - 5));
+  return drow + dcol;
 }
 
 void checkGameOver(int i, int j, char move)
