@@ -11,6 +11,7 @@ int evaluate();
 int check4winner(int i, int j, char move);
 int scoreWindow(char c1, char c2, char c3, char c4);
 int distToCenter(int row, int col);
+bool timeUp();
 void checkGameOver(int i, int j, char move);
 void getamove(int &row, int &col);
 void makemove(int &row, int &col);
@@ -149,9 +150,43 @@ int evaluate ()
 }
 
 void makemove(int &row, int &col)
-{ int best=-20000,depth=maxdepth,score,mi=1,mj=1,alpha=-999999,beta=999999;
+{ int best=-2000000, depth=maxdepth, score, mi=1, mj=1, alpha=-9999999, beta=9999999;
 
   start = steady_clock::now();
+
+  // If can win, do immediately
+  for (int i=1; i<=8; i++) {
+    for (int j=1; j<=8; j++) {
+      if (b[i][j] == '-') {
+        b[i][j] = 'O';
+        if (check4winner(i, j, 'O') == 1000000) {
+          cout << "my move is " << i << " " << j << endl;
+          row = i;
+          col = j;
+          return;
+        }
+        b[i][j] = '-';
+      }
+    }
+  }
+
+  // If player can win, block it
+  for (int i=1; i<=8; i++) {
+    for (int j=1; j<=8; j++) {
+      if (b[i][j] == '-') {
+        b[i][j] = 'X';
+        if (check4winner(i, j, 'X') == -1000000) {
+          b[i][j] = '-';
+          cout << "my move is " << i << " " << j << endl;
+          b[i][j] = 'O';
+          row = i;
+          col = j;
+          return;
+        }
+        b[i][j] = '-';
+      }
+    }
+  }
 
   for (int i=1; i<=8; i++)
   { for (int j=1; j<=8; j++)
@@ -183,9 +218,10 @@ int min(int depth, int alpha, int beta) // player turn
   { for (int j=1; j<9; j++)
     { if (b[i][j]=='-')
       { b[i][j]='X'; // make move on board
-        if (check4winner(i, j, 'X') != 0){
+        int result = check4winner(i, j, 'X');
+        if (result != 0){
           b[i][j]='-'; //undo move
-          return check4winner(i, j, 'X');
+          return result;
         } 
         score = max(depth-1, alpha, beta);
         if (score < best) best=score;
@@ -204,9 +240,10 @@ int max(int depth, int alpha, int beta) // computer turn
   { for (int j=1; j<9; j++)
     { if (b[i][j]=='-')
       { b[i][j]='O'; // make move on board
-        if (check4winner(i, j, 'O') != 0) {
+        int result = check4winner(i, j, 'O');
+        if (result != 0) {
           b[i][j]='-';  // undo move
-          return check4winner(i, j, 'O');
+          return result;
         }
         score = min(depth-1, alpha, beta);
         if (score > best) best=score;
@@ -219,7 +256,7 @@ int max(int depth, int alpha, int beta) // computer turn
   return(best);
 }
 
-int check4winner(int i, int j, char move) // i and j represent last move made; return 5000 for computer win, -5000 for player
+int check4winner(int i, int j, char move) // i and j represent last move made; return 1000000 for computer win, -1000000 for player
 { int temp; int count;
 
   // check horizontal win condition
@@ -236,9 +273,9 @@ int check4winner(int i, int j, char move) // i and j represent last move made; r
     temp++;
   }
 
-  if (count == 4) {
-    if (move == 'X') return -5000;
-    if (move == 'O') return 5000;
+  if (count >= 4) {
+    if (move == 'X') return -1000000;
+    if (move == 'O') return 1000000;
   }
 
   // check vertical win conditions
@@ -255,9 +292,9 @@ int check4winner(int i, int j, char move) // i and j represent last move made; r
     temp++;
   }
 
-  if (count == 4) {
-    if (move == 'X') return -5000;
-    if (move == 'O') return 5000;
+  if (count >= 4) {
+    if (move == 'X') return -1000000;
+    if (move == 'O') return 1000000;
   }
 
   for (int i=1; i<=8; i++)
@@ -310,7 +347,7 @@ bool timeUp()
 void checkGameOver(int i, int j, char move)
 { printboard();
   int result = check4winner(i, j, move);
-  if (result == -5000) { cout << "you win" << endl; exit(0); }
-  if (result == 5000)  { cout << "I win"   << endl; exit(0); }
+  if (result == -1000000) { cout << "you win" << endl; exit(0); }
+  if (result == 1000000)  { cout << "I win"   << endl; exit(0); }
   if (result == 1)     { cout << "draw"    << endl; exit(0); }
 }
