@@ -20,10 +20,13 @@ void makemove(int &row, int &col);
 void setup();
 void printboard();
 
-char b[9][9], maxdepth = 5;
+char b[9][9];
+int maxdepth = 6;
 
 steady_clock::time_point start;
 int timeLimit = 5000; //ms
+
+int firstPlay = 0;
 
 int main ()
 { int r; int c;
@@ -31,11 +34,20 @@ int main ()
   printboard();
   for (;;)
   { 
-    getamove(r, c);
-    checkGameOver(r, c, 'X');
+    if (firstPlay == 1) {
+      makemove(r, c);
+      checkGameOver(r, c, 'O');
 
-    makemove(r, c);
-    checkGameOver(r, c, 'O');
+      getamove(r, c);
+      checkGameOver(r, c, 'X');
+    } else {
+      getamove(r, c);
+      checkGameOver(r, c, 'X');
+
+      makemove(r, c);
+      checkGameOver(r, c, 'O');
+    }
+    
 } }
 
 void printboard()
@@ -69,6 +81,13 @@ void setup()
   for (int i = 0; i < 9 - 1; i++) {
     b[i+1][0] = 'A' + i;
   }
+
+  cout << "Enter computer time limit (seconds): ";
+  cin >> timeLimit;
+  timeLimit *= 1000;
+
+  cout << "Which player moves first? \n[0] Player\n[1] Computer";
+  cin >> firstPlay;
 }
 
 void getamove(int &row, int &col)
@@ -101,6 +120,7 @@ void getamove(int &row, int &col)
       break;
     }
   }
+  printboard();
 }
 
 
@@ -161,7 +181,8 @@ void makemove(int &row, int &col)
     b[4][4] = 'O';
     row = 4;
     col = 4;
-    cout << "my move is D4" << endl;
+    printboard();
+    cout << "D4" << endl;
     return;
   }
 
@@ -171,9 +192,10 @@ void makemove(int &row, int &col)
       if (b[i][j] == '-') {
         b[i][j] = 'O';
         if (check4winner(i, j, 'O') == 1000000) {
-          cout << "my move is " << b[i][0] << j << endl;
           row = i;
           col = j;
+          printboard();
+          cout << b[i][0] << j << endl;
           return;
         }
         b[i][j] = '-';
@@ -187,11 +209,11 @@ void makemove(int &row, int &col)
       if (b[i][j] == '-') {
         b[i][j] = 'X';
         if (check4winner(i, j, 'X') == -1000000) {
-          b[i][j] = '-';
-          cout << "my move is " << b[i][0] << j << endl;
           b[i][j] = 'O';
           row = i;
           col = j;
+          printboard();
+          cout << b[i][0] << j << endl;
           return;
         }
         b[i][j] = '-';
@@ -201,7 +223,7 @@ void makemove(int &row, int &col)
 
   for (int i=1; i<=8; i++)
   { for (int j=1; j<=8; j++)
-    { if (b[i][j]== '-')
+    { if (b[i][j]== '-' && hasNeighbor(i,j))
       { b[i][j] = 'O';
         int result = check4winner(i, j, 'O');
         if (result != 0) {
@@ -216,10 +238,11 @@ void makemove(int &row, int &col)
         }
         b[i][j]='-'; // undo move
   } } }
-  cout << "my move is " << b[mi][0] << mj << endl;
   b[mi][mj]='O';
   row = mi;
   col = mj;
+  printboard();
+  cout << b[mi][0] << mj << endl;
 }
 
 int min(int depth, int alpha, int beta) // player turn
@@ -383,7 +406,7 @@ bool hasNeighbor(int row, int col) {
 }
 
 void checkGameOver(int i, int j, char move)
-{ printboard();
+{
   int result = check4winner(i, j, move);
   if (result == -1000000) { cout << "you win" << endl; exit(0); }
   if (result == 1000000)  { cout << "I win"   << endl; exit(0); }
