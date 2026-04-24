@@ -12,13 +12,15 @@ int check4winner(int i, int j, char move);
 int scoreWindow(char c1, char c2, char c3, char c4);
 int distToCenter(int row, int col);
 bool timeUp();
+bool boardEmpty();
+bool hasNeighbor(int row, int col);
 void checkGameOver(int i, int j, char move);
 void getamove(int &row, int &col);
 void makemove(int &row, int &col);
 void setup();
 void printboard();
 
-char b[9][9], maxdepth = 4;
+char b[9][9], maxdepth = 5;
 
 steady_clock::time_point start;
 int timeLimit = 5000; //ms
@@ -28,7 +30,8 @@ int main ()
   setup();
   printboard();
   for (;;)
-  { getamove(r, c);
+  { 
+    getamove(r, c);
     checkGameOver(r, c, 'X');
 
     makemove(r, c);
@@ -154,13 +157,21 @@ void makemove(int &row, int &col)
 
   start = steady_clock::now();
 
+  if (boardEmpty()) {
+    b[4][4] = 'O';
+    row = 4;
+    col = 4;
+    cout << "my move is D4" << endl;
+    return;
+  }
+
   // If can win, do immediately
   for (int i=1; i<=8; i++) {
     for (int j=1; j<=8; j++) {
       if (b[i][j] == '-') {
         b[i][j] = 'O';
         if (check4winner(i, j, 'O') == 1000000) {
-          cout << "my move is " << i << " " << j << endl;
+          cout << "my move is " << b[i][0] << j << endl;
           row = i;
           col = j;
           return;
@@ -177,7 +188,7 @@ void makemove(int &row, int &col)
         b[i][j] = 'X';
         if (check4winner(i, j, 'X') == -1000000) {
           b[i][j] = '-';
-          cout << "my move is " << i << " " << j << endl;
+          cout << "my move is " << b[i][0] << j << endl;
           b[i][j] = 'O';
           row = i;
           col = j;
@@ -205,7 +216,7 @@ void makemove(int &row, int &col)
         }
         b[i][j]='-'; // undo move
   } } }
-  cout << "my move is " << mi << " " << mj << endl;
+  cout << "my move is " << b[mi][0] << mj << endl;
   b[mi][mj]='O';
   row = mi;
   col = mj;
@@ -216,7 +227,7 @@ int min(int depth, int alpha, int beta) // player turn
   if (depth == 0 || timeUp()) return (evaluate());
   for (int i=1; i<9; i++)
   { for (int j=1; j<9; j++)
-    { if (b[i][j]=='-')
+    { if (b[i][j]=='-' && hasNeighbor(i,j))
       { b[i][j]='X'; // make move on board
         int result = check4winner(i, j, 'X');
         if (result != 0){
@@ -238,7 +249,7 @@ int max(int depth, int alpha, int beta) // computer turn
   if (depth == 0 || timeUp()) return (evaluate());
   for (int i=1; i<9; i++)
   { for (int j=1; j<9; j++)
-    { if (b[i][j]=='-')
+    { if (b[i][j]=='-' && hasNeighbor(i, j))
       { b[i][j]='O'; // make move on board
         int result = check4winner(i, j, 'O');
         if (result != 0) {
@@ -328,13 +339,17 @@ int scoreWindow(char c1, char c2, char c3, char c4)
 
   if (oCount > 0 && xCount > 0) return 0;
 
-  if (oCount == 3 && emptyCount == 1) return 2000;
-  if (oCount == 2 && emptyCount == 2) return 300;
-  if (oCount == 1 && emptyCount == 3) return 100;
+  if (oCount == 4) return 1000000;
+  if (xCount == 4) return -1000000;
 
-  if (xCount == 3 && emptyCount == 1) return -2500;
-  if (xCount == 2 && emptyCount == 2) return -500;
-  if (xCount == 1 && emptyCount == 3) return -100;
+  if (oCount == 3 && emptyCount == 1) return 3000;
+  if (xCount == 3 && emptyCount == 1) return -3500;
+
+  if (oCount == 2 && emptyCount == 2) return 400;
+  if (xCount == 2 && emptyCount == 2) return -450;
+
+  if (oCount == 1 && emptyCount == 3) return 50;
+  if (xCount == 1 && emptyCount == 3) return -50;
 
   return 0;
 }
@@ -342,6 +357,29 @@ int scoreWindow(char c1, char c2, char c3, char c4)
 bool timeUp() 
 {
   return duration_cast<milliseconds>(steady_clock::now() - start).count() >= timeLimit;
+}
+
+bool boardEmpty() 
+{
+  for (int i = 1; i <= 8; i++) {
+    for (int j = 1; j <= 8; j++) {
+      if (b[i][j] != '-') return false;
+    }
+  }
+  return true;
+}
+
+bool hasNeighbor(int row, int col) {
+  for (int i = row - 1; i <= row + 1; i++) {
+    for (int j = col - 1; j <= col + 1; j++) {
+      if (i >= 1 && i <= 8 && j >= 1 && j <= 8) {
+        if (!(i == row && j == col) && (b[i][j] == 'X' || b[i][j] == 'O')) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
 }
 
 void checkGameOver(int i, int j, char move)
