@@ -1,11 +1,15 @@
 // Simple tic-tac-toe with minimax
 #include <iostream>
+#include <chrono>
+
 using namespace std;
+using namespace std::chrono;
 
 int min(int depth, int alpha, int beta);
 int max(int depth, int alpha, int beta);
 int evaluate();
 int check4winner(int i, int j, char move);
+int scoreWindow(char c1, char c2, char c3, char c4);
 int distToCenter(int row, int col);
 void checkGameOver(int i, int j, char move);
 void getamove(int &row, int &col);
@@ -14,6 +18,9 @@ void setup();
 void printboard();
 
 char b[9][9], maxdepth = 4;
+
+steady_clock::time_point start;
+int timeLimit = 5000; //ms
 
 int main ()
 { int r; int c;
@@ -107,121 +114,45 @@ void getamove(int &row, int &col)
 
 // Note: is only one way. Can prioritize a certain O/X
 int evaluate ()
-{ int score=0;
+{ 
+  int score=0;
   
-  // win already considered through check4win()
-
+  // Check horizontal window of 4
   for (int i = 1; i <= 8; i++) {
-    int count1=0;
-    char move1='-';
-    int count2=0;
-    char move2='-';
+    for (int j = 1; j <= 5; j++) {
+      score += scoreWindow(b[i][j], b[i][j+1], b[i][j+2], b[i][j+3]);
+    }
+  }
+
+  // Check vertical window of 4
+  for (int j = 1; j <= 8; j++) {
+    for (int i = 1; i <= 5; i++) {
+      score += scoreWindow(b[i][j], b[i+1][j], b[i+2][j], b[i+3][j]);
+    }
+  }
+
+  // Reward being closer to center
+  for (int i = 1; i <= 8; i++) {
     for (int j = 1; j <= 8; j++) {
-      // horizontal
-      if (b[i][j] == '-') {
-        if (count1 == 2) {  // 2 in a row
-          if (move1 == 'X') score -= 400;
-          if (move1 == 'O') score += 300;
-        }
-        count1 = 0;
-        move1 = '-';
-      } else if (b[i][j] == 'X') {
-        if (move1 == 'X') {
-          count1++;
-        } else {
-          if (count1 == 2) score += 300;
-          move1 = 'X';
-          count1 = 1;
-        }
-      } else {
-        if (move1 == 'O') {
-          count1++;
-        } else {
-          if (count1 == 2) score -= 400;
-          move1 = 'O';
-          count1 = 1;
-        }
-      }
-      if (count1 == 3) {
-        if (move1 == 'X') score -= 1200;
-        if (move1 == 'O') score += 1000;
-      }
+      int bonus = 8 - distToCenter(i, j);
 
-      // vertical
-      if (b[j][i] == '-') {
-        if (count2 == 2) {  // 2 in a row
-          if (move2 == 'X') score -= 400;
-          if (move2 == 'O') score += 300;
-        }
-        count2 = 0;
-        move2 = '-';
-      } else if (b[j][i] == 'X') {
-        if (move2 == 'X') {
-          count2++;
-        } else {
-          if (count2 == 2) score += 300;
-          move2 = 'X';
-          count2 = 1;
-        }
-      } else {
-        if (move2 == 'O') {
-          count2++;
-        } else {
-          if (count2 == 2) score -= 400;
-          move2 = 'O';
-          count2 = 1;
-        }
-      }
-      if (count2 == 3) {
-        if (move2 == 'X') score -= 2500;
-        if (move2 == 'O') score += 2000;
-      }
-
-      // reward for being around other already placed tiles
       if (b[i][j] == 'O') {
-        for (int dRow = -1; dRow <= 1; dRow++) {
-          for (int dCol = -1; dCol <= 1; dCol++) {
-            if (dRow == 0 && dCol == 0) continue;
-      
-            int ni = i + dRow;
-            int nj = j + dCol;
-      
-            if (ni < 1 || ni > 8 || nj < 1 || nj > 8) continue;
-      
-            if (b[ni][nj] == 'X') score += 20;
-            if (b[ni][nj] == 'O') score += 10;
-          }
-        }
+        score += 20 * bonus;
       } else if (b[i][j] == 'X') {
-        for (int dRow = -1; dRow <= 1; dRow++) {
-          for (int dCol = -1; dCol <= 1; dCol++) {
-            if (dRow == 0 && dCol == 0) continue;
-      
-            int ni = i + dRow;
-            int nj = j + dCol;
-      
-            if (ni < 1 || ni > 8 || nj < 1 || nj > 8) continue;
-      
-            if (b[ni][nj] == 'O') score -= 20;
-            if (b[ni][nj] == 'X') score -= 10;
-          }
-        }
-      }
-
-      // reward being towards middle
-      if (b[i][j] == 'O') {
-        score += 8 - distToCenter(i, j);
-      } else if (b[i][j] == 'X') {
-        score -= 8 - distToCenter(i, j);
+        score -= 20 * bonus;
       }
     }
   }
+
 
   return score;
 }
 
 void makemove(int &row, int &col)
 { int best=-20000,depth=maxdepth,score,mi=1,mj=1,alpha=-999999,beta=999999;
+
+  start = steady_clock::now();
+
   for (int i=1; i<=8; i++)
   { for (int j=1; j<=8; j++)
     { if (b[i][j]== '-')
@@ -247,7 +178,7 @@ void makemove(int &row, int &col)
 
 int min(int depth, int alpha, int beta) // player turn
 { int best=20000,score;
-  if (depth == 0) return (evaluate());
+  if (depth == 0 || timeUp()) return (evaluate());
   for (int i=1; i<9; i++)
   { for (int j=1; j<9; j++)
     { if (b[i][j]=='-')
@@ -268,7 +199,7 @@ int min(int depth, int alpha, int beta) // player turn
 
 int max(int depth, int alpha, int beta) // computer turn
 { int best=-20000,score;
-  if (depth == 0) return (evaluate());
+  if (depth == 0 || timeUp()) return (evaluate());
   for (int i=1; i<9; i++)
   { for (int j=1; j<9; j++)
     { if (b[i][j]=='-')
@@ -340,6 +271,40 @@ int distToCenter(int row, int col)
   int drow = min(abs(row - 4), abs(row - 5));
   int dcol = min(abs(col - 4), abs(col - 5));
   return drow + dcol;
+}
+
+int scoreWindow(char c1, char c2, char c3, char c4)
+{
+  int oCount = 0, xCount = 0, emptyCount = 0;
+
+  char cells[4] = {c1, c2, c3, c4};
+
+  for (int i = 0; i < 4; i++) {
+    if (cells[i] == 'O') {
+      oCount++;
+    } else if (cells[i] == 'X') {
+      xCount++;
+    } else {
+      emptyCount++;
+    }
+  }
+
+  if (oCount > 0 && xCount > 0) return 0;
+
+  if (oCount == 3 && emptyCount == 1) return 2000;
+  if (oCount == 2 && emptyCount == 2) return 300;
+  if (oCount == 1 && emptyCount == 3) return 100;
+
+  if (xCount == 3 && emptyCount == 1) return -2500;
+  if (xCount == 2 && emptyCount == 2) return -500;
+  if (xCount == 1 && emptyCount == 3) return -100;
+
+  return 0;
+}
+
+bool timeUp() 
+{
+  return duration_cast<milliseconds>(steady_clock::now() - start).count() >= timeLimit;
 }
 
 void checkGameOver(int i, int j, char move)
