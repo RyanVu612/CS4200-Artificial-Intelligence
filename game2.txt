@@ -1,16 +1,9 @@
 // Simple tic-tac-toe with minimax
 #include <iostream>
 #include <chrono>
-#include <vector>
-#include <algorithm>
 
 using namespace std;
 using namespace std::chrono;
-
-struct Move {
-  int row, col;
-  int priority;
-};
 
 int min(int depth, int alpha, int beta);
 int max(int depth, int alpha, int beta);
@@ -18,21 +11,16 @@ int evaluate();
 int check4winner(int i, int j, char move);
 int scoreWindow(char c1, char c2, char c3, char c4);
 int distToCenter(int row, int col);
-int scoreNeighbor(int row, int col);
-int movePriority(int row, int col, char move);
 bool timeUp();
 bool boardEmpty();
 bool hasNeighbor(int row, int col);
-bool betterMoveFirst(const Move &a, const Move &b);
-vector<Move> generateMoves(char move);
 void checkGameOver(int i, int j, char move);
 void getamove(int &row, int &col);
 void makemove(int &row, int &col);
 void setup();
 void printboard();
 
-char b[9][9];
-int maxdepth = 8;
+char b[9][9], maxdepth = 6;
 
 steady_clock::time_point start;
 int timeLimit = 5000; //ms
@@ -73,7 +61,6 @@ void printboard()
     }
     cout << endl;
   }
-  cout << endl;
 }
 
 void setup()
@@ -98,7 +85,7 @@ void setup()
   cin >> timeLimit;
   timeLimit *= 1000;
 
-  cout << "Which player moves first? \n[0] Player\n[1] Computer\n";
+  cout << "Which player moves first? \n[0] Player\n[1] Computer";
   cin >> firstPlay;
 }
 
@@ -132,7 +119,6 @@ void getamove(int &row, int &col)
       break;
     }
   }
-  printboard();
 }
 
 
@@ -185,7 +171,7 @@ int evaluate ()
 }
 
 void makemove(int &row, int &col)
-{
+{ int best=-2000000, depth=maxdepth, score, mi=1, mj=1, alpha=-9999999, beta=9999999;
 
   start = steady_clock::now();
 
@@ -198,118 +184,108 @@ void makemove(int &row, int &col)
     return;
   }
 
-  int bestRow = -1, bestCol = -1;
-  int bestScore = -2000000;
-
-  for (int depth = 1; depth <= maxdepth; depth++) {
-    int currentBestRow = -1, currentBestCol = -1;
-    int currentBestScore = -2000000;
-
-    int alpha = -9999999;
-    int beta = 9999999;
-  
-    vector<Move> moves = generateMoves('O');
-  
-    for (int k = 0; k < moves.size(); k++) {
-      Move m = moves[k];
-      int i = m.row;
-      int j = m.col;
-  
-      b[i][j] = 'O';
-      int result = check4winner(i, j, 'O');
-      int score;
-      if (result != 0) {
-        score = result;
-      } else {
-        score = min(depth - 1, alpha, beta);
+  // If can win, do immediately
+  for (int i=1; i<=8; i++) {
+    for (int j=1; j<=8; j++) {
+      if (b[i][j] == '-') {
+        b[i][j] = 'O';
+        if (check4winner(i, j, 'O') == 1000000) {
+          row = i;
+          col = j;
+          printboard();
+          cout << b[i][0] << j << endl;
+          return;
+        }
+        b[i][j] = '-';
       }
-
-      b[i][j] = '-'; // undo move
-
-      if (timeUp()) break;
-
-      if (score > currentBestScore || (score == currentBestScore && distToCenter(i, j) < distToCenter(currentBestRow, currentBestCol))) {
-        currentBestRow = i;
-        currentBestCol = j;
-        currentBestScore = score;
-      }
-
-      if (score > alpha) alpha = score;
-    }
-
-    if (!timeUp() && currentBestRow != -1) {
-      bestRow = currentBestRow;
-      bestCol = currentBestCol;
-      bestScore = currentBestScore;
-    } else {
-      break;
     }
   }
-  b[bestRow][bestCol]='O';
-  row = bestRow;
-  col = bestCol;
+
+  // If player can win, block it
+  for (int i=1; i<=8; i++) {
+    for (int j=1; j<=8; j++) {
+      if (b[i][j] == '-') {
+        b[i][j] = 'X';
+        if (check4winner(i, j, 'X') == -1000000) {
+          b[i][j] = 'O';
+          row = i;
+          col = j;
+          printboard();
+          cout << b[i][0] << j << endl;
+          return;
+        }
+        b[i][j] = '-';
+      }
+    }
+  }
+
+  for (int i=1; i<=8; i++)
+  { for (int j=1; j<=8; j++)
+    { if (b[i][j]== '-')
+      { b[i][j] = 'O';
+        int result = check4winner(i, j, 'O');
+        if (result != 0) {
+          score = result;
+        } else {
+          score = min(depth - 1, alpha, beta);
+        }
+        if (score > best || (score == best && distToCenter(i, j) < distToCenter(mi, mj))) {
+          mi = i;
+          mj = j;
+          best = score;
+        }
+        b[i][j]='-'; // undo move
+  } } }
+  b[mi][mj]='O';
+  row = mi;
+  col = mj;
   printboard();
-  cout << b[bestRow][0] << bestCol << endl;
+  cout << b[mi][0] << mj << endl;
 }
 
 int min(int depth, int alpha, int beta) // player turn
 { int best=20000,score;
   if (depth == 0 || timeUp()) return (evaluate());
+  for (int i=1; i<9; i++)
+  { for (int j=1; j<9; j++)
+    { if (b[i][j]=='-' && hasNeighbor(i,j))
+      { b[i][j]='X'; // make move on board
+        int result = check4winner(i, j, 'X');
+        if (result != 0){
+          b[i][j]='-'; //undo move
+          return result;
+        } 
+        score = max(depth-1, alpha, beta);
+        if (score < best) best=score;
+        if (score < beta) beta=score;
+        b[i][j]='-'; // undo move
 
-  vector<Move> moves = generateMoves('X');
-  
-  for (int k = 0; k < moves.size(); k++) {
-    Move m = moves[k];
-    int i = m.row;
-    int j = m.col;
-
-    b[i][j] = 'X';
-    int result = check4winner(i, j, 'X');
-    if (result != 0) {
-      b[i][j] = '-';
-      return result;
-    }
-
-    score = max(depth - 1, alpha, beta);
-    if (score < best) best = score;
-    if (best < beta) beta = best;
-
-    b[i][j] = '-';
-
-    if (beta <= alpha) return best;
-  }
-
-  return best;
+        if (beta <= alpha) return best;
+  } } }
+  return(best);
 }
 
 int max(int depth, int alpha, int beta) // computer turn
 { int best=-20000,score;
   if (depth == 0 || timeUp()) return (evaluate());
+  for (int i=1; i<9; i++)
+  { for (int j=1; j<9; j++)
+    { if (b[i][j]=='-' && hasNeighbor(i, j))
+      { b[i][j]='O'; // make move on board
+        int result = check4winner(i, j, 'O');
+        if (result != 0) {
+          b[i][j]='-';  // undo move
+          return result;
+        }
+        score = min(depth-1, alpha, beta);
+        if (score > best) best=score;
+        if (best > alpha) alpha=best;
 
-  vector<Move> moves = generateMoves('O');
-  
-  for (int k = 0; k < moves.size(); k++) {
-    Move m = moves[k];
-    int i = m.row;
-    int j = m.col;
+        b[i][j]='-'; // undo move
 
-    b[i][j] = 'O';
-    int result = check4winner(i, j, 'O');
-    if (result != 0) {
-      b[i][j] = '-';
-      return result;
-    }
-
-    score = min(depth - 1, alpha, beta);
-    if (score > best) best = score;
-    if (best > alpha) alpha = best;
-
-    b[i][j] = '-';
-
-    if (alpha >= beta) return best;
-  }
-
-  return best;
+        if (alpha >= beta) return best;
+  } } }
+  return(best);
 }
 
 int check4winner(int i, int j, char move) // i and j represent last move made; return 1000000 for computer win, -1000000 for player
@@ -399,57 +375,6 @@ int scoreWindow(char c1, char c2, char c3, char c4)
   return 0;
 }
 
-int scoreNeighbor(int row, int col) {
-  int score = 0;
-
-  for (int i = row - 1; i <= row + 1; i++) {
-    for (int j = col - 1; j <= col + 1; j++) {
-      if (i >= 1 && i <= 8 && j >= 1 && j <= 8) {
-        if (row == i && col == j) continue;
-
-        if (b[i][j] == 'O') score += 3;
-        if (b[i][j] == 'X') score += 2;
-      }
-    }
-  }
-  return score;
-}
-
-int movePriority(int row, int col, char move) {
-  int priority = 0;
-
-  // 1. Immediate Win
-  b[row][col] = move;
-  int result = check4winner(row, col, move);
-  b[row][col] = '-';
-
-  if (move == 'O' && result == 1000000) return 1000000;
-  if (move == 'X' && result == -1000000) return -1000000;
-
-  // 2. Immediate Blocking Win
-  char opponent;
-  if (move == 'O') {
-    opponent = 'X';
-  } else if (move == 'X') {
-    opponent = 'O';
-  }
-
-  b[row][col] = opponent;
-  int opponentResult = check4winner(row, col, opponent);
-  b[row][col] = '-';
-
-  if (move == 'O' && opponentResult == 1000000) priority += 900000;
-  if (move == 'X' && opponentResult == -1000000) priority += 900000;
-
-  // 3. Connected Moves
-  priority += scoreNeighbor(row, col) * 100;
-
-  // 4. Center
-  priority += (10 - distToCenter(row, col)) * 10;
-
-  return priority;
-}
-
 bool timeUp() 
 {
   return duration_cast<milliseconds>(steady_clock::now() - start).count() >= timeLimit;
@@ -476,29 +401,6 @@ bool hasNeighbor(int row, int col) {
     }
   }
   return false;
-}
-
-bool betterMoveFirst(const Move &a, const Move &b) {
-  return a.priority > b.priority;
-}
-
-vector<Move> generateMoves(char move) {
-  vector<Move> moves;
-
-  for (int i = 1; i <= 8; i++) {
-    for (int j = 1; j <= 8; j++) {
-      if (b[i][j] == '-' && hasNeighbor(i, j)) {
-        Move m;
-        m.row = i;
-        m.col = j;
-        m.priority = movePriority(i, j, move);
-        moves.push_back(m);
-      }
-    }
-  }
-
-  sort(moves.begin(), moves.end(), betterMoveFirst);
-  return moves;
 }
 
 void checkGameOver(int i, int j, char move)
