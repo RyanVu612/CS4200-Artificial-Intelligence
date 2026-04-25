@@ -198,6 +198,41 @@ void makemove(int &row, int &col)
     return;
   }
 
+  // If can win, do immediately
+  for (int i=1; i<=8; i++) {
+    for (int j=1; j<=8; j++) {
+      if (b[i][j] == '-') {
+        b[i][j] = 'O';
+        if (check4winner(i, j, 'O') == 1000000) {
+          row = i;
+          col = j;
+          printboard();
+          cout << b[i][0] << j << endl;
+          return;
+        }
+        b[i][j] = '-';
+      }
+    }
+  }
+
+  // If player can win, block it
+  for (int i=1; i<=8; i++) {
+    for (int j=1; j<=8; j++) {
+      if (b[i][j] == '-') {
+        b[i][j] = 'X';
+        if (check4winner(i, j, 'X') == -1000000) {
+          b[i][j] = 'O';
+          row = i;
+          col = j;
+          printboard();
+          cout << b[i][0] << j << endl;
+          return;
+        }
+        b[i][j] = '-';
+      }
+    }
+  }
+
   int bestRow = -1, bestCol = -1;
   int bestScore = -2000000;
 
