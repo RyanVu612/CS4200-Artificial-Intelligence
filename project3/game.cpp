@@ -95,11 +95,19 @@ void setup()
     b[i+1][0] = 'A' + i;
   }
 
-  cout << "Enter computer time limit (seconds): ";
-  cin >> timeLimit;
-  timeLimit *= 1000;
+  cout << "Enter computer time limit (5 - 30 seconds): ";
+  timeLimit = -1;
 
-  cout << "Which player moves first? \n[0] Player\n[1] Computer\n";
+  while (timeLimit < 5 || timeLimit > 30) {
+    cin >> timeLimit;
+    timeLimit *= 1000;
+
+    if (timeLimit < 5 || timeLimit > 30) {
+      cout << "Please enter a time limit between 5 and 30 seconds: ";
+    }
+  }
+
+  cout << "Which player moves first? [0]Player [1]Computer: ";
   cin >> firstPlay;
 }
 
