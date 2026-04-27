@@ -25,6 +25,7 @@ bool boardEmpty();
 bool hasNeighbor(int row, int col);
 bool betterMoveFirst(const Move &a, const Move &b);
 vector<Move> generateMoves(char move);
+void prioritizeBestMove(vector<Move> &moves, int bestRow, int bestCol);
 void checkGameOver(int i, int j, char move);
 void getamove(int &row, int &col);
 void makemove(int &row, int &col);
@@ -244,6 +245,9 @@ void makemove(int &row, int &col)
     int beta = 9999999;
   
     vector<Move> moves = generateMoves('O');
+    if (bestRow != -1) {
+      prioritizeBestMove(moves, bestRow, bestCol);
+    }
   
     for (int k = 0; k < moves.size(); k++) {
       Move m = moves[k];
@@ -423,10 +427,10 @@ int scoreWindow(char c1, char c2, char c3, char c4)
   if (xCount == 4) return -1000000;
 
   if (oCount == 3 && emptyCount == 1) return 3000;
-  if (xCount == 3 && emptyCount == 1) return -3500;
+  if (xCount == 3 && emptyCount == 1) return -4000;
 
   if (oCount == 2 && emptyCount == 2) return 400;
-  if (xCount == 2 && emptyCount == 2) return -450;
+  if (xCount == 2 && emptyCount == 2) return -500;
 
   if (oCount == 1 && emptyCount == 3) return 50;
   if (xCount == 1 && emptyCount == 3) return -50;
@@ -459,7 +463,7 @@ int movePriority(int row, int col, char move) {
   b[row][col] = '-';
 
   if (move == 'O' && result == 1000000) return 1000000;
-  if (move == 'X' && result == -1000000) return -1000000;
+  if (move == 'X' && result == -1000000) return 1000000;
 
   // 2. Immediate Blocking Win
   char opponent;
@@ -473,8 +477,8 @@ int movePriority(int row, int col, char move) {
   int opponentResult = check4winner(row, col, opponent);
   b[row][col] = '-';
 
-  if (move == 'O' && opponentResult == 1000000) priority += 900000;
-  if (move == 'X' && opponentResult == -1000000) priority += 900000;
+  if (move == 'O' && opponentResult == -1000000) priority += 900000;
+  if (move == 'X' && opponentResult == 1000000) priority += 900000;
 
   // 3. Connected Moves
   priority += scoreNeighbor(row, col) * 100;
@@ -534,6 +538,15 @@ vector<Move> generateMoves(char move) {
 
   sort(moves.begin(), moves.end(), betterMoveFirst);
   return moves;
+}
+
+void prioritizeBestMove(vector<Move> &moves, int bestRow, int bestCol) {
+  for (int i = 0; i < moves.size(); i++) {
+    if (moves[i].row == bestRow && moves[i].col == bestCol) {
+      swap(moves[0], moves[i]);
+      return;
+    }
+  }
 }
 
 void checkGameOver(int i, int j, char move)
