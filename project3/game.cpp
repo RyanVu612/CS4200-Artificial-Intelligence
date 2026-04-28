@@ -100,12 +100,12 @@ void setup()
 
   while (timeLimit < 5 || timeLimit > 30) {
     cin >> timeLimit;
-    timeLimit *= 1000;
-
     if (timeLimit < 5 || timeLimit > 30) {
       cout << "Please enter a time limit between 5 and 30 seconds: ";
     }
   }
+
+  timeLimit *= 1000;
 
   cout << "Which player moves first? [0]Player [1]Computer: ";
   cin >> firstPlay;
@@ -182,9 +182,9 @@ int evaluate ()
       int bonus = 8 - distToCenter(i, j);
 
       if (b[i][j] == 'O') {
-        score += 20 * bonus;
+        score += 10 * bonus;
       } else if (b[i][j] == 'X') {
-        score -= 20 * bonus;
+        score -= 10 * bonus;
       }
     }
   }
@@ -417,7 +417,7 @@ int scoreWindow(char c1, char c2, char c3, char c4)
 {
   int oCount = 0, xCount = 0, emptyCount = 0;
 
-  char cells[4] = {c1, c2, c3, c4};
+  char cells[5] = {c1, c2, c3, c4};
 
   for (int i = 0; i < 4; i++) {
     if (cells[i] == 'O') {
@@ -429,19 +429,14 @@ int scoreWindow(char c1, char c2, char c3, char c4)
     }
   }
 
-  if (oCount > 0 && xCount > 0) return 0;
-
   if (oCount == 4) return 1000000;
   if (xCount == 4) return -1000000;
 
-  if (oCount == 3 && emptyCount == 1) return 3000;
-  if (xCount == 3 && emptyCount == 1) return -4000;
+  if (oCount == 3 && emptyCount == 1) return 10000;
+  if (xCount == 3 && emptyCount == 1) return -12000;
 
   if (oCount == 2 && emptyCount == 2) return 400;
-  if (xCount == 2 && emptyCount == 2) return -500;
-
-  if (oCount == 1 && emptyCount == 3) return 50;
-  if (xCount == 1 && emptyCount == 3) return -50;
+  if (xCount == 2 && emptyCount == 2) return -1000;
 
   return 0;
 }
@@ -513,8 +508,8 @@ bool boardEmpty()
 }
 
 bool hasNeighbor(int row, int col) {
-  for (int i = row - 1; i <= row + 1; i++) {
-    for (int j = col - 1; j <= col + 1; j++) {
+  for (int i = row - 3; i <= row + 3; i++) {
+    for (int j = col - 3; j <= col + 3; j++) {
       if (i >= 1 && i <= 8 && j >= 1 && j <= 8) {
         if (!(i == row && j == col) && (b[i][j] == 'X' || b[i][j] == 'O')) {
           return true;
