@@ -1,0 +1,440 @@
+(base) ryanvu@b98-aruba-authenticated-10-110-164-97 project3 % ./game
+Enter computer time limit (5 - 30 seconds): 5
+Which player moves first? [0]Player [1]Computer: 0
+
+  1 2 3 4 5 6 7 8
+A - - - - - - - -
+B - - - - - - - -
+C - - - - - - - -
+D - - - - - - - -
+E - - - - - - - -
+F - - - - - - - -
+G - - - - - - - -
+H - - - - - - - -
+
+Enter row: E
+Enter column: 5
+
+  1 2 3 4 5 6 7 8
+A - - - - - - - -
+B - - - - - - - -
+C - - - - - - - -
+D - - - - - - - -
+E - - - - X - - -
+F - - - - - - - -
+G - - - - - - - -
+H - - - - - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - - - -
+B - - - - - - - -
+C - - - - - - - -
+D - - - - - - - -
+E - - O - X - - -
+F - - - - - - - -
+G - - - - - - - -
+H - - - - - - - -
+
+E3
+Enter row: D
+Enter column: 5
+
+  1 2 3 4 5 6 7 8
+A - - - - - - - -
+B - - - - - - - -
+C - - - - - - - -
+D - - - - X - - -
+E - - O - X - - -
+F - - - - - - - -
+G - - - - - - - -
+H - - - - - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - - - -
+B - - - - - - - -
+C - - - - - - - -
+D - - - - X - - -
+E - - O - X - - -
+F - - - - O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+F5
+Enter row: D
+Enter column: 4
+
+  1 2 3 4 5 6 7 8
+A - - - - - - - -
+B - - - - - - - -
+C - - - - - - - -
+D - - - X X - - -
+E - - O - X - - -
+F - - - - O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - - - -
+B - - - - - - - -
+C - - - - - - - -
+D - - O X X - - -
+E - - O - X - - -
+F - - - - O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+D3
+Enter row: C
+Enter column: 3
+
+  1 2 3 4 5 6 7 8
+A - - - - - - - -
+B - - - - - - - -
+C - - X - - - - -
+D - - O X X - - -
+E - - O - X - - -
+F - - - - O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - - - -
+B - - - - - - - -
+C - - X O - - - -
+D - - O X X - - -
+E - - O - X - - -
+F - - - - O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+C4
+Enter row: C
+Enter column: 5
+
+  1 2 3 4 5 6 7 8
+A - - - - - - - -
+B - - - - - - - -
+C - - X O X - - -
+D - - O X X - - -
+E - - O - X - - -
+F - - - - O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - - - -
+B - - - - O - - -
+C - - X O X - - -
+D - - O X X - - -
+E - - O - X - - -
+F - - - - O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+B5
+Enter row: D
+Enter column: 6
+
+  1 2 3 4 5 6 7 8
+A - - - - - - - -
+B - - - - O - - -
+C - - X O X - - -
+D - - O X X X - -
+E - - O - X - - -
+F - - - - O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - - - -
+B - - - - O - - -
+C - - X O X - - -
+D - - O X X X O -
+E - - O - X - - -
+F - - - - O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+D7
+Enter row: C
+Enter column: 6
+
+  1 2 3 4 5 6 7 8
+A - - - - - - - -
+B - - - - O - - -
+C - - X O X X - -
+D - - O X X X O -
+E - - O - X - - -
+F - - - - O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - - - -
+B - - - - O - - -
+C - - X O X X - -
+D - - O X X X O -
+E - - O - X O - -
+F - - - - O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+E6
+Enter row: B
+Enter column: 6
+
+  1 2 3 4 5 6 7 8
+A - - - - - - - -
+B - - - - O X - -
+C - - X O X X - -
+D - - O X X X O -
+E - - O - X O - -
+F - - - - O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X - -
+C - - X O X X - -
+D - - O X X X O -
+E - - O - X O - -
+F - - - - O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+A6
+Enter row: C
+Enter column: 8
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X - -
+C - - X O X X - X
+D - - O X X X O -
+E - - O - X O - -
+F - - - - O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X - -
+C - - X O X X O X
+D - - O X X X O -
+E - - O - X O - -
+F - - - - O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+C7
+Enter row: B
+Enter column: 7
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X X -
+C - - X O X X O X
+D - - O X X X O -
+E - - O - X O - -
+F - - - - O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X X -
+C - - X O X X O X
+D - - O X X X O -
+E - - O - X O - -
+F - - - O O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+F4
+Enter row: F
+Enter column: 3
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X X -
+C - - X O X X O X
+D - - O X X X O -
+E - - O - X O - -
+F - - X O O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X X -
+C - - X O X X O X
+D - - O X X X O -
+E - - O O X O - -
+F - - X O O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+E4
+Enter row: E
+Enter column: 1
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X X -
+C - - X O X X O X
+D - - O X X X O -
+E X - O O X O - -
+F - - X O O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X X -
+C - - X O X X O X
+D - - O X X X O -
+E X O O O X O - -
+F - - X O O - - -
+G - - - - - - - -
+H - - - - - - - -
+
+E2
+Enter row: G
+Enter column: 1
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X X -
+C - - X O X X O X
+D - - O X X X O -
+E X O O O X O - -
+F - - X O O - - -
+G X - - - - - - -
+H - - - - - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X X -
+C - - X O X X O X
+D - - O X X X O -
+E X O O O X O - -
+F - - X O O - - -
+G X - - O - - - -
+H - - - - - - - -
+
+G4
+Enter row: H
+Enter column: 4
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X X -
+C - - X O X X O X
+D - - O X X X O -
+E X O O O X O - -
+F - - X O O - - -
+G X - - O - - - -
+H - - - X - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X X -
+C - - X O X X O X
+D - - O X X X O -
+E X O O O X O - -
+F - - X O O - - -
+G X - - O O - - -
+H - - - X - - - -
+
+G5
+Enter row: G
+Enter column: 6
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X X -
+C - - X O X X O X
+D - - O X X X O -
+E X O O O X O - -
+F - - X O O - - -
+G X - - O O X - -
+H - - - X - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X X -
+C - - X O X X O X
+D - - O X X X O -
+E X O O O X O - -
+F - - X O O - - -
+G X - O O O X - -
+H - - - X - - - -
+
+G3
+Enter row: G
+Enter column: 2
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X X -
+C - - X O X X O X
+D - - O X X X O -
+E X O O O X O - -
+F - - X O O - - -
+G X X O O O X - -
+H - - - X - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X X -
+C - - X O X X O X
+D - - O X X X O -
+E X O O O X O - -
+F - - X O O - O -
+G X X O O O X - -
+H - - - X - - - -
+
+F7
+Enter row: F
+Enter column: 6
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X X -
+C - - X O X X O X
+D - - O X X X O -
+E X O O O X O - -
+F - - X O O X O -
+G X X O O O X - -
+H - - - X - - - -
+
+
+  1 2 3 4 5 6 7 8
+A - - - - - O - -
+B - - - - O X X -
+C - - X O X X O X
+D - - O X X X O -
+E X O O O X O O -
+F - - X O O X O -
+G X X O O O X - -
+H - - - X - - - -
+
+E7
+I win
