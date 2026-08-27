@@ -1,0 +1,5 @@
+.DS_Store
+*.class
+project3/game
+project3/game2
+*.dSYM/

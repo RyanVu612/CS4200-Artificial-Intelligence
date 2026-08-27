@@ -1,4 +1,4 @@
-# Project 2: Connect 4
+# Project 3: Connect 4
 
 ## Instructions
 * Compile code by entering "g++ game.cpp -o game" in the terminal
